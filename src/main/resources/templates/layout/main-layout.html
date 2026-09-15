@@ -16,11 +16,14 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+                <ul class="navbar-space navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/products}">Catalogue</a>
+                        <a class="nav-link" th:href="@{/}">Home</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasAnyAuthority('STORE_SUPERVISOR', 'OPERATIONS_MANAGER')">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/products}">Products</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_STORE_SUPERVISOR')">
                         <a class="nav-link" th:href="@{/products/manage}">Manage Products</a>
                     </li>
                 </ul>
