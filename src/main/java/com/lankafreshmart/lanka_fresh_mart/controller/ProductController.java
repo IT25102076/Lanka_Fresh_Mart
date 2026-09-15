@@ -36,8 +36,19 @@ public class ProductController {
     }
 
     @PostMapping("/manage/add")
-    public String addProduct(@ModelAttribute Product product, RedirectAttributes redirectAttributes) {
+    public String addProduct(@ModelAttribute Product product, 
+                             @RequestParam(value = "imageFile", required = false) org.springframework.web.multipart.MultipartFile imageFile,
+                             RedirectAttributes redirectAttributes) {
         try {
+            if (imageFile != null && !imageFile.isEmpty()) {
+                String filename = java.util.UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
+                java.nio.file.Path uploadPath = java.nio.file.Paths.get("uploads");
+                if (!java.nio.file.Files.exists(uploadPath)) {
+                    java.nio.file.Files.createDirectories(uploadPath);
+                }
+                java.nio.file.Files.copy(imageFile.getInputStream(), uploadPath.resolve(filename), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                product.setImageUrl("/uploads/" + filename);
+            }
             productService.saveProduct(product);
             redirectAttributes.addFlashAttribute("success", "Product added successfully!");
         } catch (Exception e) {
@@ -57,8 +68,19 @@ public class ProductController {
     }
 
     @PostMapping("/manage/edit/{id}")
-    public String updateProduct(@PathVariable Long id, @ModelAttribute Product product, RedirectAttributes redirectAttributes) {
+    public String updateProduct(@PathVariable Long id, @ModelAttribute Product product, 
+                                @RequestParam(value = "imageFile", required = false) org.springframework.web.multipart.MultipartFile imageFile,
+                                RedirectAttributes redirectAttributes) {
         try {
+            if (imageFile != null && !imageFile.isEmpty()) {
+                String filename = java.util.UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
+                java.nio.file.Path uploadPath = java.nio.file.Paths.get("uploads");
+                if (!java.nio.file.Files.exists(uploadPath)) {
+                    java.nio.file.Files.createDirectories(uploadPath);
+                }
+                java.nio.file.Files.copy(imageFile.getInputStream(), uploadPath.resolve(filename), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                product.setImageUrl("/uploads/" + filename);
+            }
             productService.updateProduct(id, product);
             redirectAttributes.addFlashAttribute("success", "Product updated successfully!");
         } catch (Exception e) {
