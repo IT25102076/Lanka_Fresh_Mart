@@ -15,6 +15,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final InventoryService inventoryService;
+    private final com.lankafreshmart.lanka_fresh_mart.repository.InventoryAlertRepository inventoryAlertRepository;
 
     public List<Product> getAllProducts() {
         return productRepository.findAll();
@@ -63,5 +64,12 @@ public class ProductService {
         Product existingProduct = getProductById(id);
         existingProduct.setAvailability(Product.Availability.UNAVAILABLE);
         productRepository.save(existingProduct);
+    }
+
+    @Transactional
+    public void hardDeleteProduct(Long id) {
+        Product product = getProductById(id);
+        inventoryAlertRepository.deleteByProduct(product);
+        productRepository.deleteById(id);
     }
 }
