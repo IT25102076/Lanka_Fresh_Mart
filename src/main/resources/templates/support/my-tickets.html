@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<head>
+    <title>My Support Tickets - Lanka Fresh Mart</title>
+</head>
+<body>
+    <div class="container my-5">
+        <h2 class="mb-4"><i class="bi bi-headset"></i> Customer Support</h2>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div class="row">
+            <!-- Create Ticket Form -->
+            <div class="col-md-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white fw-bold">Open a New Ticket</div>
+                    <div class="card-body">
+                        <form th:action="@{/support/create}" method="post">
+                            <div class="mb-3">
+                                <label class="form-label">Subject</label>
+                                <input type="text" name="subject" class="form-control" required placeholder="e.g. Missing Item in Order">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Message</label>
+                                <textarea name="message" class="form-control" rows="4" required placeholder="Describe your issue in detail..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Submit Ticket</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Tickets List -->
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light fw-bold">My Recent Tickets</div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(tickets)}" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox fs-1"></i>
+                            <p class="mt-2">You haven't opened any support tickets yet.</p>
+                        </div>
+
+                        <div th:each="ticket : ${tickets}" class="border rounded p-3 mb-3 position-relative">
+                            <span class="badge position-absolute top-0 end-0 m-3" 
+                                  th:classappend="${ticket.status.name() == 'OPEN' ? 'bg-warning text-dark' : (ticket.status.name() == 'RESOLVED' ? 'bg-success' : 'bg-info')}"
+                                  th:text="${ticket.status}">
+                            </span>
+                            
+                            <h5 th:text="${ticket.subject}"></h5>
+                            <small class="text-muted d-block mb-2">Opened on <span th:text="${#temporals.format(ticket.createdAt, 'dd-MM-yyyy HH:mm')}"></span></small>
+                            
+                            <div class="bg-light p-2 rounded mb-2">
+                                <strong>You wrote:</strong>
+                                <p class="mb-0" th:text="${ticket.message}"></p>
+                            </div>
+
+                            <div th:if="${ticket.adminReply}" class="bg-primary text-white p-2 rounded">
+                                <strong><i class="bi bi-person-badge"></i> Support Reply:</strong>
+                                <p class="mb-0" th:text="${ticket.adminReply}"></p>
+                            </div>
+                            <div th:unless="${ticket.adminReply}" class="text-muted fst-italic">
+                                <small>Awaiting reply from our support team...</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
