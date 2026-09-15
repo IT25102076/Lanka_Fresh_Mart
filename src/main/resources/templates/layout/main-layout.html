@@ -23,6 +23,11 @@
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/products}">Products</a>
                     </li>
+                    <li class="nav-item" sec:authorize="hasRole('ROLE_CUSTOMER')">
+                        <a class="nav-link" th:href="@{/cart}">
+                            <i class="bi bi-cart"></i> Cart
+                        </a>
+                    </li>
                     <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_STORE_SUPERVISOR')">
                         <a class="nav-link" th:href="@{/products/manage}">Manage Products</a>
                     </li>
