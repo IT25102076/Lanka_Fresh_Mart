@@ -22,7 +22,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 // Public pages — anyone can access
-                .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/", "/register", "/login", "/fast-switch", "/css/**", "/js/**", "/images/**").permitAll()
                 // Role-based access
                 .requestMatchers("/products/manage/**").hasAnyAuthority("STORE_SUPERVISOR", "OPERATIONS_MANAGER")
                 .requestMatchers("/inventory/**").hasAnyAuthority("STORE_SUPERVISOR", "OPERATIONS_MANAGER")
