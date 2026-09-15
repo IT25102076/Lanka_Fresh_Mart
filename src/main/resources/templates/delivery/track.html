@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<head>
+    <title>Track Deliveries - Lanka Fresh Mart</title>
+</head>
+<body>
+    <div>
+        <h2 class="mb-4">Track Your Deliveries</h2>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+        <div class="row" th:if="${not #lists.isEmpty(deliveries)}">
+            <div class="col-md-6 mb-4" th:each="delivery : ${deliveries}">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center"
+                         th:classappend="${delivery.status.name() == 'DELIVERED'} ? 'bg-success text-white' : 'bg-light'">
+                        <span class="fw-bold">Order #<span th:text="${delivery.order.id}"></span></span>
+                        <span class="badge rounded-pill" 
+                              th:classappend="${delivery.status.name() == 'PREPARING'} ? 'bg-secondary' : (${delivery.status.name() == 'DISPATCHED'} ? 'bg-warning text-dark' : 'bg-light text-success')"
+                              th:text="${delivery.status}">STATUS</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-1 text-muted small">Placed on: <span th:text="${#temporals.format(delivery.order.createdAt, 'dd-MM-yyyy HH:mm')}">Date</span></p>
+                        <h5 class="card-title text-primary"><span th:text="${#numbers.formatDecimal(delivery.order.totalAmount, 1, 2)}"></span> LKR</h5>
+                        <hr>
+                        <p class="mb-1"><strong>Address:</strong> <span th:text="${delivery.deliveryAddress}"></span></p>
+                        <p class="mb-1"><strong>Scheduled:</strong> <span th:text="${#temporals.format(delivery.scheduledDate, 'dd-MM-yyyy')}"></span></p>
+                        <p class="mb-0" th:if="${delivery.driverName != null}"><strong>Driver:</strong> <span th:text="${delivery.driverName}"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(deliveries)}" class="text-center py-5">
+            <h4 class="text-muted">You have no active deliveries.</h4>
+            <a th:href="@{/products}" class="btn btn-primary mt-3">Start Shopping</a>
+        </div>
+    </div>
+</body>
+</html>

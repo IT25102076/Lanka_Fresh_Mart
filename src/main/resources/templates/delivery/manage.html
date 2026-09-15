@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<head>
+    <title>Manage Deliveries - Lanka Fresh Mart</title>
+</head>
+<body>
+    <div>
+        <h2 class="mb-4">Delivery Management Dashboard</h2>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3">Order ID</th>
+                                <th>Customer</th>
+                                <th>Address</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Update</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="delivery : ${deliveries}">
+                                <td class="ps-3 fw-bold" th:text="'#' + ${delivery.order.id}">1</td>
+                                <td>
+                                    <div th:text="${delivery.order.user.firstName + ' ' + delivery.order.user.lastName}">Name</div>
+                                    <small class="text-muted" th:text="${delivery.order.user.phone}">Phone</small>
+                                </td>
+                                <td><small th:text="${delivery.deliveryAddress}">Address</small></td>
+                                <td th:text="${#temporals.format(delivery.order.createdAt, 'dd-MM HH:mm')}">Date</td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${delivery.status.name() == 'PREPARING'} ? 'bg-secondary' : (${delivery.status.name() == 'DISPATCHED'} ? 'bg-warning text-dark' : 'bg-success')"
+                                          th:text="${delivery.status}">STATUS</span>
+                                </td>
+                                <td>
+                                    <form th:action="@{/deliveries/update/{id}(id=${delivery.id})}" method="post" class="d-flex align-items-center">
+                                        <select name="status" class="form-select form-select-sm me-2" style="width: auto;">
+                                            <option value="PREPARING" th:selected="${delivery.status.name() == 'PREPARING'}">PREPARING</option>
+                                            <option value="DISPATCHED" th:selected="${delivery.status.name() == 'DISPATCHED'}">DISPATCHED</option>
+                                            <option value="DELIVERED" th:selected="${delivery.status.name() == 'DELIVERED'}">DELIVERED</option>
+                                        </select>
+                                        <input type="text" name="driverName" class="form-control form-control-sm me-2" placeholder="Driver Name" th:value="${delivery.driverName}" style="width: 120px;">
+                                        <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
