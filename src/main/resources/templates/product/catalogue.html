@@ -31,8 +31,10 @@
                                 </h5>
                                 <small class="text-muted">per <span th:text="${product.unit}">kg</span></small>
                             </div>
-                            <!-- Cart button will go here in Cart Management Sprint -->
-                            <button class="btn btn-outline-success btn-sm disabled">Add to Cart</button>
+                            <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn-outline-success btn-sm">Add to Cart</button>
+                            </form>
                         </div>
                     </div>
                 </div>
