@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<head>
+    <title>Edit Product - Lanka Fresh Mart</title>
+</head>
+<body>
+    <div>
+        <div class="mb-4">
+            <a th:href="@{/products/manage}" class="btn btn-outline-secondary">&laquo; Back to Products</a>
+        </div>
+        
+        <div class="card shadow-sm max-w-800 mx-auto">
+            <div class="card-header bg-white">
+                <h3 class="mb-0">Edit Product: <span th:text="${product.productCode}">PRD-123</span></h3>
+            </div>
+            <div class="card-body p-4">
+                <form th:action="@{/products/manage/edit/{id}(id=${product.id})}" th:object="${product}" method="post">
+                    
+                    <!-- Basic Info -->
+                    <h5 class="border-bottom pb-2 mb-3">Basic Information</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Product Name *</label>
+                            <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="category" class="form-label">Category *</label>
+                            <select class="form-select" id="category" th:field="*{category}" required>
+                                <option th:each="cat : ${T(com.lankafreshmart.lanka_fresh_mart.model.Product.Category).values()}" 
+                                        th:value="${cat}" th:text="${cat}">Category</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" th:field="*{description}" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="imageUrl" class="form-label">Image URL</label>
+                        <input type="url" class="form-control" id="imageUrl" th:field="*{imageUrl}" placeholder="https://example.com/image.jpg">
+                    </div>
+
+                    <!-- Pricing & Inventory -->
+                    <h5 class="border-bottom pb-2 mb-3">Pricing & Inventory</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="price" class="form-label">Price (LKR) *</label>
+                            <input type="number" step="0.01" class="form-control" id="price" th:field="*{price}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="unit" class="form-label">Unit *</label>
+                            <input type="text" class="form-control" id="unit" th:field="*{unit}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="availability" class="form-label">Status *</label>
+                            <select class="form-select" id="availability" th:field="*{availability}" required>
+                                <option th:each="avail : ${T(com.lankafreshmart.lanka_fresh_mart.model.Product.Availability).values()}" 
+                                        th:value="${avail}" th:text="${avail}">Status</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="quantityOnHand" class="form-label">Stock Quantity *</label>
+                            <input type="number" class="form-control" id="quantityOnHand" th:field="*{quantityOnHand}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="reorderLevel" class="form-label">Reorder Alert Level *</label>
+                            <input type="number" class="form-control" id="reorderLevel" th:field="*{reorderLevel}" required>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <a th:href="@{/products/manage}" class="btn btn-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Update Product</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
