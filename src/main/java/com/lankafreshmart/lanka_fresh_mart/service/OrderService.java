@@ -21,6 +21,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final RefundService refundService;
 
     public List<Order> getAllOrders() {
         return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -71,5 +72,8 @@ public class OrderService {
 
         order.setStatus(Order.Status.CANCELLED);
         orderRepository.save(order);
+        
+        // Automatically create a pending refund for the cancelled order
+        refundService.createRefundForOrder(order);
     }
 }
