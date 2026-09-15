@@ -45,7 +45,6 @@
                                             <option value="DISPATCHED" th:selected="${delivery.status.name() == 'DISPATCHED'}">DISPATCHED</option>
                                             <option value="DELIVERED" th:selected="${delivery.status.name() == 'DELIVERED'}">DELIVERED</option>
                                         </select>
-                                        <input type="text" name="driverName" class="form-control form-control-sm me-2" placeholder="Driver Name" th:value="${delivery.driverName}" style="width: 120px;">
                                         <button type="submit" class="btn btn-sm btn-primary">Save</button>
                                     </form>
                                 </td>
