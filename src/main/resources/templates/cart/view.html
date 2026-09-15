@@ -79,7 +79,7 @@
                             <strong>Total</strong>
                             <strong class="fs-5 text-primary" th:text="${#aggregates.sum(cart.items.![priceAtTime * quantity])} + ' LKR'">0.00 LKR</strong>
                         </div>
-                        <button class="btn btn-success w-100 py-2 disabled">Proceed to Checkout</button>
+                        <a th:href="@{/checkout}" class="btn btn-success w-100 py-2">Proceed to Checkout</a>
                         <div class="text-center mt-3">
                             <form th:action="@{/cart/clear}" method="post">
                                 <button type="submit" class="btn btn-link text-danger text-decoration-none btn-sm" onclick="return confirm('Are you sure you want to empty your cart?');">Empty Cart</button>
