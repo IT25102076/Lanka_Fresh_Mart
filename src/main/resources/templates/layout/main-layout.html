@@ -29,10 +29,16 @@
                         </a>
                     </li>
                     <li class="nav-item" sec:authorize="hasRole('ROLE_CUSTOMER')">
+                        <a class="nav-link" th:href="@{/orders/my-orders}">My Orders</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ROLE_CUSTOMER')">
                         <a class="nav-link" th:href="@{/deliveries/track}">Track Delivery</a>
                     </li>
                     <li class="nav-item" sec:authorize="hasRole('ROLE_CUSTOMER')">
                         <a class="nav-link" th:href="@{/support/my-tickets}"><i class="bi bi-headset"></i> Support</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ROLE_CUSTOMER_RELATIONS_OFFICER') or hasRole('ROLE_OPERATIONS_MANAGER')">
+                        <a class="nav-link text-info fw-bold" th:href="@{/orders/manage}"><i class="bi bi-list-check"></i> Manage Orders</a>
                     </li>
                     <li class="nav-item" sec:authorize="hasRole('ROLE_DELIVERY_COORDINATOR') or hasRole('ROLE_OPERATIONS_MANAGER')">
                         <a class="nav-link" th:href="@{/routing/dashboard}">Route Optimization</a>
