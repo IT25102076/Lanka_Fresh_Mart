@@ -33,7 +33,7 @@ public class OrderDeliveryService {
         BigDecimal total = BigDecimal.ZERO;
         Order order = new Order();
         order.setUser(cart.getUser());
-        order.setStatus(Order.Status.CONFIRMED); // Auto confirm for now
+        order.setStatus(Order.Status.PENDING); // Initially pending so it can be cancelled
 
         // Process items and reduce stock
         for (CartItem cartItem : cart.getItems()) {
