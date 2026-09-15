@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<head>
+    <title>Home - Lanka Fresh Mart</title>
+</head>
+<body>
+    <div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold text-success">Welcome to Lanka Fresh Mart</h1>
+            <p class="col-md-8 fs-4" sec:authorize="isAuthenticated()">
+                Hello, <span sec:authentication="name">User</span>! You are logged in with the role of 
+                <span class="badge bg-primary" sec:authentication="principal.authorities"></span>.
+            </p>
+            <p class="col-md-8 fs-4" sec:authorize="!isAuthenticated()">
+                Please login or register to access the full features of the system.
+            </p>
+            
+            <div class="mt-4" sec:authorize="hasAnyAuthority('STORE_SUPERVISOR', 'OPERATIONS_MANAGER')">
+                <a th:href="@{/products/manage}" class="btn btn-primary btn-lg me-2">Manage Products</a>
+                <a th:href="@{/inventory}" class="btn btn-info btn-lg">Manage Inventory</a>
+            </div>
+            
+            <div class="mt-4" sec:authorize="hasAuthority('CUSTOMER')">
+                <a th:href="@{/products}" class="btn btn-success btn-lg me-2">Browse Catalogue</a>
+                <a th:href="@{/cart}" class="btn btn-outline-success btn-lg">View Cart</a>
+            </div>
+            
+            <div class="mt-4" sec:authorize="hasAnyAuthority('CUSTOMER_RELATIONS_OFFICER', 'OPERATIONS_MANAGER')">
+                <a th:href="@{/orders/manage}" class="btn btn-warning btn-lg">Manage Orders</a>
+            </div>
+            
+            <div class="mt-4" sec:authorize="hasAnyAuthority('DELIVERY_COORDINATOR', 'OPERATIONS_MANAGER')">
+                <a th:href="@{/delivery}" class="btn btn-secondary btn-lg">Manage Deliveries</a>
+            </div>
+            
+            <div class="mt-4" sec:authorize="hasAnyAuthority('FINANCE_EXECUTIVE', 'OPERATIONS_MANAGER')">
+                <a th:href="@{/payments}" class="btn btn-dark btn-lg">Manage Payments</a>
+            </div>
+            
+        </div>
+    </div>
+</body>
+</html>
