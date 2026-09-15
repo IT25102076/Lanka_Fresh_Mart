@@ -25,7 +25,6 @@
                         <hr>
                         <p class="mb-1"><strong>Address:</strong> <span th:text="${delivery.deliveryAddress}"></span></p>
                         <p class="mb-1"><strong>Scheduled:</strong> <span th:text="${#temporals.format(delivery.scheduledDate, 'dd-MM-yyyy')}"></span></p>
-                        <p class="mb-0" th:if="${delivery.driverName != null}"><strong>Driver:</strong> <span th:text="${delivery.driverName}"></span></p>
                     </div>
                 </div>
             </div>

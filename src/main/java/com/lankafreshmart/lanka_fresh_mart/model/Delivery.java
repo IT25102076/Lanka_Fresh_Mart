@@ -32,7 +32,9 @@ public class Delivery {
     @Column(nullable = false)
     private Status status;
 
-    private String driverName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delivery_route_id")
+    private DeliveryRoute deliveryRoute;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;
