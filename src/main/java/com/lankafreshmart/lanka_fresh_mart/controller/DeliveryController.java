@@ -52,10 +52,9 @@ public class DeliveryController {
 
     @PostMapping("/deliveries/update/{id}")
     public String updateDeliveryStatus(@PathVariable Long id, @RequestParam Delivery.Status status, 
-                                       @RequestParam(required = false) String driverName, 
                                        RedirectAttributes redirectAttributes) {
         try {
-            deliveryService.updateDeliveryStatus(id, status, driverName);
+            deliveryService.updateDeliveryStatus(id, status);
             redirectAttributes.addFlashAttribute("success", "Delivery status updated!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

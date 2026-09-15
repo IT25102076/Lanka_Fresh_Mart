@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<head>
+    <title>Route Optimization - Lanka Fresh Mart</title>
+</head>
+<body>
+    <div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-map"></i> Delivery Routing Dashboard</h2>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <!-- Date Selector & Optimize Button -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body bg-light rounded d-flex justify-content-between align-items-center">
+                <form th:action="@{/routing/dashboard}" method="get" class="d-flex align-items-center">
+                    <label class="me-2 fw-bold">Select Date:</label>
+                    <input type="date" name="date" class="form-control me-2" th:value="${selectedDate}" style="width: 200px;">
+                    <button type="submit" class="btn btn-outline-secondary">View Routes</button>
+                </form>
+
+                <form th:action="@{/routing/optimize}" method="post" class="m-0">
+                    <input type="hidden" name="date" th:value="${selectedDate}">
+                    <button type="submit" class="btn btn-primary shadow-sm">
+                        <i class="bi bi-magic"></i> Auto-Optimize Routes
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Routes Display -->
+        <div class="row" th:if="${not #lists.isEmpty(routes)}">
+            <div class="col-md-6 mb-4" th:each="route : ${routes}">
+                <div class="card shadow-sm h-100 border-primary">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0" th:text="${route.routeName}">Route Name</h5>
+                        <span class="badge bg-light text-primary" th:text="${route.status}">STATUS</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2"><strong><i class="bi bi-calendar"></i> Date:</strong> <span th:text="${#temporals.format(route.scheduledDate, 'dd-MM-yyyy')}"></span></p>
+                        
+                        <div class="mb-3" th:if="${route.driverName == null}">
+                            <form th:action="@{/routing/assign-driver/{id}(id=${route.id})}" method="post" class="d-flex">
+                                <input type="hidden" name="date" th:value="${selectedDate}">
+                                <input type="text" name="driverName" class="form-control form-control-sm me-2" placeholder="Assign Driver Name" required>
+                                <button type="submit" class="btn btn-sm btn-success">Assign</button>
+                            </form>
+                        </div>
+                        <div class="mb-3" th:if="${route.driverName != null}">
+                            <strong><i class="bi bi-person-badge"></i> Driver:</strong> <span class="text-success fw-bold" th:text="${route.driverName}"></span>
+                        </div>
+
+                        <hr>
+                        <h6>Deliveries (<span th:text="${route.deliveries.size()}"></span>/5 max capacity)</h6>
+                        <ul class="list-group list-group-flush small">
+                            <li class="list-group-item px-0" th:each="delivery : ${route.deliveries}">
+                                <strong>Order #<span th:text="${delivery.order.id}"></span>:</strong> <span th:text="${delivery.deliveryAddress}"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(routes)}" class="text-center py-5">
+            <div class="display-1 text-muted mb-3"><i class="bi bi-signpost-split"></i></div>
+            <h4 class="text-muted">No Routes Generated Yet</h4>
+            <p>Click "Auto-Optimize Routes" to group all unassigned deliveries for <span th:text="${#temporals.format(selectedDate, 'dd-MM-yyyy')}"></span>.</p>
+        </div>
+    </div>
+</body>
+</html>
