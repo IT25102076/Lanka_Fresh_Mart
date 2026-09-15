@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<head>
+    <title>Checkout - Lanka Fresh Mart</title>
+</head>
+<body>
+    <div>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0">Checkout Details</h4>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/checkout}" method="post">
+                            <div class="mb-4">
+                                <label for="deliveryAddress" class="form-label fw-bold">Delivery Address</label>
+                                <textarea class="form-control" id="deliveryAddress" name="deliveryAddress" rows="3" placeholder="Enter your full street address, city, and postal code..." required></textarea>
+                                <div class="form-text">We currently only deliver within Colombo and suburbs.</div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i> Cash on Delivery is the only currently supported payment method. Your order will be placed immediately.
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <a th:href="@{/cart}" class="btn btn-outline-secondary">Back to Cart</a>
+                                <button type="submit" class="btn btn-success px-4">Place Order</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
