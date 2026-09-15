@@ -19,6 +19,7 @@ public class OrderDeliveryService {
     private final DeliveryRepository deliveryRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final InventoryService inventoryService;
 
     @Transactional
     public Delivery createOrderFromCart(String username, String deliveryAddress) {
@@ -44,6 +45,9 @@ public class OrderDeliveryService {
             // Reduce stock
             product.setQuantityOnHand(product.getQuantityOnHand() - cartItem.getQuantity());
             productRepository.save(product);
+            
+            // Check for low stock alerts
+            inventoryService.checkAndCreateAlert(product);
 
             // Create Order Item
             OrderItem orderItem = new OrderItem();
