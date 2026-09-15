@@ -55,6 +55,8 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(Long id) {
-        productRepository.deleteById(id);
+        Product existingProduct = getProductById(id);
+        existingProduct.setAvailability(Product.Availability.UNAVAILABLE);
+        productRepository.save(existingProduct);
     }
 }
