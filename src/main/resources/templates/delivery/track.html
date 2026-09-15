@@ -16,7 +16,7 @@
                          th:classappend="${delivery.status.name() == 'DELIVERED'} ? 'bg-success text-white' : 'bg-light'">
                         <span class="fw-bold">Order #<span th:text="${delivery.order.id}"></span></span>
                         <span class="badge rounded-pill" 
-                              th:classappend="${delivery.status.name() == 'PREPARING'} ? 'bg-secondary' : (${delivery.status.name() == 'DISPATCHED'} ? 'bg-warning text-dark' : 'bg-light text-success')"
+                              th:classappend="${delivery.status.name() == 'PREPARING'} ? 'bg-secondary' : (${delivery.status.name() == 'DISPATCHED'} ? 'bg-warning text-dark' : (${delivery.status.name() == 'CANCELLED'} ? 'bg-danger' : 'bg-light text-success'))"
                               th:text="${delivery.status}">STATUS</span>
                     </div>
                     <div class="card-body">

@@ -65,12 +65,10 @@
                     <li class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('STORE_SUPERVISOR')">
                         <a class="nav-link" th:href="@{/products/manage}">Manage Products</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('STORE_SUPERVISOR')">
+                    <li class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('STORE_SUPERVISOR') or hasAuthority('DELIVERY_COORDINATOR') or hasAuthority('OPERATIONS_MANAGER')">
                         <a class="nav-link" th:href="@{/deliveries/manage}">Manage Deliveries</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('DELIVERY_COORDINATOR') or hasAuthority('OPERATIONS_MANAGER')">
-                        <a class="nav-link" th:href="@{/routing/dashboard}">Route Optimization</a>
-                    </li>
+
                     <li class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('STORE_SUPERVISOR')">
                         <a class="nav-link text-danger" th:href="@{/inventory/alerts}">
                             <i class="bi bi-exclamation-triangle"></i> Inventory Alerts
