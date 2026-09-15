@@ -43,12 +43,12 @@
                     <li class="nav-item" sec:authorize="hasAuthority('DELIVERY_COORDINATOR') or hasAuthority('OPERATIONS_MANAGER')">
                         <a class="nav-link" th:href="@{/routing/dashboard}">Route Optimization</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('FINANCE_MANAGER') or hasAuthority('OPERATIONS_MANAGER')">
+                    <li class="nav-item" sec:authorize="hasAuthority('FINANCE_EXECUTIVE') or hasAuthority('OPERATIONS_MANAGER')">
                         <a class="nav-link text-warning fw-bold" th:href="@{/finance/refunds}">
                             <i class="bi bi-cash-stack"></i> Process Refunds
                         </a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('FINANCE_MANAGER') or hasAuthority('OPERATIONS_MANAGER')">
+                    <li class="nav-item" sec:authorize="hasAuthority('FINANCE_EXECUTIVE') or hasAuthority('OPERATIONS_MANAGER')">
                         <a class="nav-link text-success fw-bold" th:href="@{/finance/dashboard}">
                             <i class="bi bi-graph-up-arrow"></i> Finance Dashboard
                         </a>
