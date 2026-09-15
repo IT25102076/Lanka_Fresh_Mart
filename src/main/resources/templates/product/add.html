@@ -52,7 +52,16 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="unit" class="form-label">Unit *</label>
-                            <input type="text" class="form-control" id="unit" th:field="*{unit}" placeholder="e.g. kg, piece, pack" required>
+                            <select class="form-select" id="unit" th:field="*{unit}" required>
+                                <option value="" disabled selected>Select Unit</option>
+                                <option value="kg">kg (Kilograms)</option>
+                                <option value="g">g (Grams)</option>
+                                <option value="L">L (Liters)</option>
+                                <option value="ml">ml (Milliliters)</option>
+                                <option value="pieces">pieces</option>
+                                <option value="packs">packs</option>
+                                <option value="bunches">bunches</option>
+                            </select>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="availability" class="form-label">Status *</label>
