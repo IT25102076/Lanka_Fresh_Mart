@@ -1,0 +1,52 @@
+package com.lankafreshmart.lanka_fresh_mart.config;
+
+import com.lankafreshmart.lanka_fresh_mart.model.User;
+import com.lankafreshmart.lanka_fresh_mart.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class DataSeeder implements CommandLineRunner {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public void run(String... args) throws Exception {
+        if (userRepository.count() == 0 || !userRepository.existsByEmail("customer@test.com")) {
+            System.out.println("==================================================");
+            System.out.println("SEEDING DEFAULT TEST ACCOUNTS...");
+            
+            String password = passwordEncoder.encode("password123");
+
+            createUserIfNotFound("Test", "Customer", "customer@test.com", password, User.Role.CUSTOMER);
+            createUserIfNotFound("Test", "Supervisor", "supervisor@test.com", password, User.Role.STORE_SUPERVISOR);
+            createUserIfNotFound("Test", "Delivery", "delivery@test.com", password, User.Role.DELIVERY_COORDINATOR);
+            createUserIfNotFound("Test", "Finance", "finance@test.com", password, User.Role.FINANCE_EXECUTIVE);
+            createUserIfNotFound("Test", "Support", "support@test.com", password, User.Role.CUSTOMER_RELATIONS_OFFICER);
+            createUserIfNotFound("Test", "Operations", "operations@test.com", password, User.Role.OPERATIONS_MANAGER);
+            
+            System.out.println("All test accounts created successfully!");
+            System.out.println("Password for all accounts is: password123");
+            System.out.println("==================================================");
+        }
+    }
+
+    private void createUserIfNotFound(String firstName, String lastName, String email, String password, User.Role role) {
+        if (!userRepository.existsByEmail(email)) {
+            User user = User.builder()
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .email(email)
+                    .password(password)
+                    .phone("0712345678")
+                    .address("LFM Headquarters")
+                    .role(role)
+                    .build();
+            userRepository.save(user);
+        }
+    }
+}
