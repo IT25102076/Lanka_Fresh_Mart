@@ -88,13 +88,10 @@ public class OrderDeliveryService {
     }
 
     @Transactional
-    public void updateDeliveryStatus(Long deliveryId, Delivery.Status newStatus, String driverName) {
+    public void updateDeliveryStatus(Long deliveryId, Delivery.Status newStatus) {
         Delivery delivery = deliveryRepository.findById(deliveryId)
                 .orElseThrow(() -> new RuntimeException("Delivery not found"));
         delivery.setStatus(newStatus);
-        if (driverName != null && !driverName.trim().isEmpty()) {
-            delivery.setDriverName(driverName);
-        }
         deliveryRepository.save(delivery);
     }
 }
