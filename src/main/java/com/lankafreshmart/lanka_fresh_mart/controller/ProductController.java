@@ -77,4 +77,17 @@ public class ProductController {
         }
         return "redirect:/products/manage";
     }
+
+    @PostMapping("/manage/hard-delete/{id}")
+    public String hardDeleteProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            productService.hardDeleteProduct(id);
+            redirectAttributes.addFlashAttribute("success", "Product completely deleted from the database!");
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("error", "Cannot delete product because it is linked to past orders. Please Discontinue it instead.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error deleting product: " + e.getMessage());
+        }
+        return "redirect:/products/manage";
+    }
 }
