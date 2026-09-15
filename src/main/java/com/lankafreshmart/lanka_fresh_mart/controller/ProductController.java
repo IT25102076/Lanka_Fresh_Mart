@@ -71,9 +71,9 @@ public class ProductController {
     public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             productService.deleteProduct(id);
-            redirectAttributes.addFlashAttribute("success", "Product deleted successfully!");
+            redirectAttributes.addFlashAttribute("success", "Product successfully removed or discontinued.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error deleting product: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error removing product: " + e.getMessage());
         }
         return "redirect:/products/manage";
     }

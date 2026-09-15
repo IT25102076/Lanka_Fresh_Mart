@@ -55,6 +55,14 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(Long id) {
-        productRepository.deleteById(id);
+        try {
+            productRepository.deleteById(id);
+            productRepository.flush(); // Force the delete to catch constraints
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // Product is used in orders, soft delete instead
+            Product existingProduct = getProductById(id);
+            existingProduct.setAvailability(Product.Availability.UNAVAILABLE);
+            productRepository.save(existingProduct);
+        }
     }
 }
