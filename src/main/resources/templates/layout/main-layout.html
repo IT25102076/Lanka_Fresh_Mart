@@ -44,6 +44,11 @@
                         <a class="nav-link" th:href="@{/routing/dashboard}">Route Optimization</a>
                     </li>
                     <li class="nav-item" sec:authorize="hasRole('ROLE_FINANCE_MANAGER') or hasRole('ROLE_OPERATIONS_MANAGER')">
+                        <a class="nav-link text-warning fw-bold" th:href="@{/finance/refunds}">
+                            <i class="bi bi-cash-stack"></i> Process Refunds
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ROLE_FINANCE_MANAGER') or hasRole('ROLE_OPERATIONS_MANAGER')">
                         <a class="nav-link text-success fw-bold" th:href="@{/finance/dashboard}">
                             <i class="bi bi-graph-up-arrow"></i> Finance Dashboard
                         </a>
