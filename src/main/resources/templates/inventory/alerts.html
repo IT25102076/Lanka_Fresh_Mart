@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<head>
+    <title>Inventory Alerts - Lanka Fresh Mart</title>
+</head>
+<body>
+    <div>
+        <h2 class="mb-4 text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Low Stock Alerts</h2>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div class="row" th:if="${not #lists.isEmpty(alerts)}">
+            <div class="col-md-6 mb-4" th:each="alert : ${alerts}">
+                <div class="card shadow-sm border-danger h-100">
+                    <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                        <span class="fw-bold" th:text="${alert.product.name}">Product Name</span>
+                        <span class="badge bg-light text-danger">Stock: <span th:text="${alert.product.quantityOnHand}">0</span></span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text text-danger fw-bold mb-3" th:text="${alert.alertMessage}">Alert message here</p>
+                        <p class="small text-muted mb-4">Generated on: <span th:text="${#temporals.format(alert.createdAt, 'dd-MM-yyyy HH:mm')}">Date</span></p>
+                        
+                        <form th:action="@{/inventory/restock/{id}(id=${alert.id})}" method="post" class="mt-auto">
+                            <label class="form-label small">Enter new stock received:</label>
+                            <div class="input-group">
+                                <input type="number" name="restockAmount" class="form-control" placeholder="e.g., 50" min="1" required>
+                                <button type="submit" class="btn btn-primary">Restock & Resolve</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(alerts)}" class="text-center py-5">
+            <div class="display-1 text-success mb-3"><i class="bi bi-check-circle-fill"></i></div>
+            <h4 class="text-success">All Good!</h4>
+            <p class="text-muted">There are no low stock alerts at this time.</p>
+            <a th:href="@{/products/manage}" class="btn btn-outline-primary mt-3">Go to Product Management</a>
+        </div>
+    </div>
+</body>
+</html>
