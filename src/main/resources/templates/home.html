@@ -15,9 +15,9 @@
                 Please login or register to access the full features of the system.
             </p>
             
-            <div class="mt-4" sec:authorize="hasAnyAuthority('STORE_SUPERVISOR', 'OPERATIONS_MANAGER')">
+            <div class="mt-4" sec:authorize="hasAuthority('STORE_SUPERVISOR')">
                 <a th:href="@{/products/manage}" class="btn btn-primary btn-lg me-2">Manage Products</a>
-                <a th:href="@{/inventory}" class="btn btn-info btn-lg">Manage Inventory</a>
+                <a th:href="@{/inventory/alerts}" class="btn btn-danger btn-lg">Inventory Alerts</a>
             </div>
             
             <div class="mt-4" sec:authorize="hasAuthority('CUSTOMER')">
@@ -25,16 +25,24 @@
                 <a th:href="@{/cart}" class="btn btn-outline-success btn-lg">View Cart</a>
             </div>
             
-            <div class="mt-4" sec:authorize="hasAnyAuthority('CUSTOMER_RELATIONS_OFFICER', 'OPERATIONS_MANAGER')">
-                <a th:href="@{/orders/manage}" class="btn btn-warning btn-lg">Manage Orders</a>
+            <div class="mt-4" sec:authorize="hasAuthority('CUSTOMER_RELATIONS_OFFICER')">
+                <a th:href="@{/orders/manage}" class="btn btn-warning btn-lg me-2">Manage Orders</a>
+                <a th:href="@{/support/manage}" class="btn btn-info btn-lg">Manage Support</a>
             </div>
             
-            <div class="mt-4" sec:authorize="hasAnyAuthority('DELIVERY_COORDINATOR', 'OPERATIONS_MANAGER')">
-                <a th:href="@{/delivery}" class="btn btn-secondary btn-lg">Manage Deliveries</a>
+            <div class="mt-4" sec:authorize="hasAuthority('DELIVERY_COORDINATOR')">
+                <a th:href="@{/deliveries/manage}" class="btn btn-secondary btn-lg me-2">Manage Deliveries</a>
+                <a th:href="@{/routing/dashboard}" class="btn btn-info btn-lg">Route Optimization</a>
             </div>
             
-            <div class="mt-4" sec:authorize="hasAnyAuthority('FINANCE_EXECUTIVE', 'OPERATIONS_MANAGER')">
-                <a th:href="@{/payments}" class="btn btn-dark btn-lg">Manage Payments</a>
+            <div class="mt-4" sec:authorize="hasAuthority('FINANCE_EXECUTIVE')">
+                <a th:href="@{/finance/dashboard}" class="btn btn-success btn-lg me-2">Finance Dashboard</a>
+                <a th:href="@{/finance/refunds}" class="btn btn-warning btn-lg">Process Refunds</a>
+            </div>
+            
+            <div class="mt-4" sec:authorize="hasAuthority('OPERATIONS_MANAGER')">
+                <a th:href="@{/executive-dashboard}" class="btn btn-primary btn-lg me-2">Executive Dashboard</a>
+                <a th:href="@{/finance/dashboard}" class="btn btn-success btn-lg">Finance Dashboard</a>
             </div>
             
         </div>
