@@ -34,3 +34,7 @@ build/
 
 ### Custom Folders ###
 /documentation/
+
+### Secrets ###
+application-secrets.properties
+*.env

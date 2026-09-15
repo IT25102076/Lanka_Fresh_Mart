@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .requestMatchers("/delivery/**").hasAnyAuthority("DELIVERY_COORDINATOR", "OPERATIONS_MANAGER")
                 .requestMatchers("/payments/**").hasAnyAuthority("FINANCE_EXECUTIVE", "OPERATIONS_MANAGER")
                 .requestMatchers("/dashboard/**").hasAuthority("OPERATIONS_MANAGER")
-                .requestMatchers("/cart/**", "/orders/my/**").hasAuthority("CUSTOMER")
+                .requestMatchers("/cart/**", "/orders/my/**", "/checkout/**").hasAuthority("CUSTOMER")
                 // Everything else requires login
                 .anyRequest().authenticated()
             )
