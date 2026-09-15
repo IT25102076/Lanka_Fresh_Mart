@@ -31,6 +31,9 @@
                     <li class="nav-item" sec:authorize="hasRole('ROLE_CUSTOMER')">
                         <a class="nav-link" th:href="@{/deliveries/track}">Track Delivery</a>
                     </li>
+                    <li class="nav-item" sec:authorize="hasRole('ROLE_CUSTOMER')">
+                        <a class="nav-link" th:href="@{/support/my-tickets}"><i class="bi bi-headset"></i> Support</a>
+                    </li>
                     <li class="nav-item" sec:authorize="hasRole('ROLE_DELIVERY_COORDINATOR') or hasRole('ROLE_OPERATIONS_MANAGER')">
                         <a class="nav-link" th:href="@{/routing/dashboard}">Route Optimization</a>
                     </li>
@@ -39,6 +42,10 @@
                             <i class="bi bi-graph-up-arrow"></i> Finance Dashboard
                         </a>
                     </li>
+                    <li class="nav-item" sec:authorize="hasRole('ROLE_CUSTOMER_RELATIONS_OFFICER') or hasRole('ROLE_OPERATIONS_MANAGER')">
+                        <a class="nav-link" th:href="@{/support/manage}"><i class="bi bi-kanban"></i> Manage Support</a>
+                    </li>
+
                     <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_STORE_SUPERVISOR')">
                         <a class="nav-link" th:href="@{/products/manage}">Manage Products</a>
                     </li>
