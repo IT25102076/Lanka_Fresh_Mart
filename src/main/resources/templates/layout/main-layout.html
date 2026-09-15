@@ -23,55 +23,55 @@
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/products}">Products</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasRole('ROLE_CUSTOMER')">
+                    <li class="nav-item" sec:authorize="hasAuthority('CUSTOMER')">
                         <a class="nav-link" th:href="@{/cart}">
                             <i class="bi bi-cart"></i> Cart
                         </a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasRole('ROLE_CUSTOMER')">
+                    <li class="nav-item" sec:authorize="hasAuthority('CUSTOMER')">
                         <a class="nav-link" th:href="@{/orders/my-orders}">My Orders</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasRole('ROLE_CUSTOMER')">
+                    <li class="nav-item" sec:authorize="hasAuthority('CUSTOMER')">
                         <a class="nav-link" th:href="@{/deliveries/track}">Track Delivery</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasRole('ROLE_CUSTOMER')">
+                    <li class="nav-item" sec:authorize="hasAuthority('CUSTOMER')">
                         <a class="nav-link" th:href="@{/support/my-tickets}"><i class="bi bi-headset"></i> Support</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasRole('ROLE_CUSTOMER_RELATIONS_OFFICER') or hasRole('ROLE_OPERATIONS_MANAGER')">
+                    <li class="nav-item" sec:authorize="hasAuthority('CUSTOMER_RELATIONS_OFFICER') or hasAuthority('OPERATIONS_MANAGER')">
                         <a class="nav-link text-info fw-bold" th:href="@{/orders/manage}"><i class="bi bi-list-check"></i> Manage Orders</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasRole('ROLE_DELIVERY_COORDINATOR') or hasRole('ROLE_OPERATIONS_MANAGER')">
+                    <li class="nav-item" sec:authorize="hasAuthority('DELIVERY_COORDINATOR') or hasAuthority('OPERATIONS_MANAGER')">
                         <a class="nav-link" th:href="@{/routing/dashboard}">Route Optimization</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasRole('ROLE_FINANCE_MANAGER') or hasRole('ROLE_OPERATIONS_MANAGER')">
+                    <li class="nav-item" sec:authorize="hasAuthority('FINANCE_MANAGER') or hasAuthority('OPERATIONS_MANAGER')">
                         <a class="nav-link text-warning fw-bold" th:href="@{/finance/refunds}">
                             <i class="bi bi-cash-stack"></i> Process Refunds
                         </a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasRole('ROLE_FINANCE_MANAGER') or hasRole('ROLE_OPERATIONS_MANAGER')">
+                    <li class="nav-item" sec:authorize="hasAuthority('FINANCE_MANAGER') or hasAuthority('OPERATIONS_MANAGER')">
                         <a class="nav-link text-success fw-bold" th:href="@{/finance/dashboard}">
                             <i class="bi bi-graph-up-arrow"></i> Finance Dashboard
                         </a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasRole('ROLE_CUSTOMER_RELATIONS_OFFICER') or hasRole('ROLE_OPERATIONS_MANAGER')">
+                    <li class="nav-item" sec:authorize="hasAuthority('CUSTOMER_RELATIONS_OFFICER') or hasAuthority('OPERATIONS_MANAGER')">
                         <a class="nav-link" th:href="@{/support/manage}"><i class="bi bi-kanban"></i> Manage Support</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasRole('ROLE_OPERATIONS_MANAGER')">
+                    <li class="nav-item" sec:authorize="hasAuthority('OPERATIONS_MANAGER')">
                         <a class="nav-link text-primary fw-bold" th:href="@{/executive-dashboard}">
                             <i class="bi bi-speedometer2"></i> Executive Dashboard
                         </a>
                     </li>
 
-                    <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_STORE_SUPERVISOR')">
+                    <li class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('STORE_SUPERVISOR')">
                         <a class="nav-link" th:href="@{/products/manage}">Manage Products</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_STORE_SUPERVISOR')">
+                    <li class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('STORE_SUPERVISOR')">
                         <a class="nav-link" th:href="@{/deliveries/manage}">Manage Deliveries</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasRole('ROLE_DELIVERY_COORDINATOR') or hasRole('ROLE_OPERATIONS_MANAGER')">
+                    <li class="nav-item" sec:authorize="hasAuthority('DELIVERY_COORDINATOR') or hasAuthority('OPERATIONS_MANAGER')">
                         <a class="nav-link" th:href="@{/routing/dashboard}">Route Optimization</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_STORE_SUPERVISOR')">
+                    <li class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('STORE_SUPERVISOR')">
                         <a class="nav-link text-danger" th:href="@{/inventory/alerts}">
                             <i class="bi bi-exclamation-triangle"></i> Inventory Alerts
                         </a>
@@ -83,6 +83,19 @@
                     </li>
                     <li class="nav-item" sec:authorize="!isAuthenticated()">
                         <a class="nav-link" th:href="@{/register}">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <form th:action="@{/fast-switch}" method="post" class="d-inline d-flex align-items-center ms-2" style="margin-top: 6px;">
+                            <select name="email" class="form-select form-select-sm bg-warning text-dark border-0 fw-bold" onchange="if(this.value) this.form.submit();">
+                                <option value="">⚡ Fast Switch</option>
+                                <option value="customer@test.com">Customer</option>
+                                <option value="supervisor@test.com">Store Supervisor</option>
+                                <option value="delivery@test.com">Delivery</option>
+                                <option value="finance@test.com">Finance</option>
+                                <option value="support@test.com">Support</option>
+                                <option value="operations@test.com">Operations</option>
+                            </select>
+                        </form>
                     </li>
                     <li class="nav-item" sec:authorize="isAuthenticated()">
                         <span class="nav-link text-light" sec:authentication="name">User</span>

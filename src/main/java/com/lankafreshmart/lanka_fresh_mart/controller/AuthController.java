@@ -22,6 +22,17 @@ public class AuthController {
         return "auth/login";
     }
 
+    @PostMapping("/fast-switch")
+    public String fastSwitch(@org.springframework.web.bind.annotation.RequestParam String email, jakarta.servlet.http.HttpServletRequest request) {
+        try {
+            request.logout();
+            request.login(email, "password123");
+        } catch (jakarta.servlet.ServletException e) {
+            e.printStackTrace();
+        }
+        return "redirect:/home";
+    }
+
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new UserDto());
