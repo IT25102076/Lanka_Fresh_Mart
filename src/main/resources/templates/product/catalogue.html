@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<head>
+    <title>Products Catalogue - Lanka Fresh Mart</title>
+</head>
+<body>
+    <div>
+        <div class="text-center mb-5 mt-3">
+            <h1 class="display-5 fw-bold text-success">Our Fresh Products</h1>
+            <p class="text-muted">Browse our selection of the freshest groceries in Sri Lanka.</p>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+            
+            <div th:each="product : ${products}" class="col">
+                <div class="card h-100 shadow-sm product-card">
+                    <img th:if="${product.imageUrl}" th:src="${product.imageUrl}" class="card-img-top" alt="Product Image" style="height: 200px; object-fit: cover;">
+                    <img th:unless="${product.imageUrl}" th:src="@{/images/placeholder.jpg}" class="card-img-top bg-light" alt="No Image" style="height: 200px; object-fit: contain;">
+                    
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0" th:text="${product.name}">Product Name</h5>
+                            <span class="badge bg-success" th:text="${product.category}">CATEGORY</span>
+                        </div>
+                        <p class="card-text text-muted small flex-grow-1" th:text="${product.description}">Product description goes here.</p>
+                        
+                        <div class="mt-3 d-flex justify-content-between align-items-end">
+                            <div>
+                                <h5 class="text-primary mb-0">
+                                    <span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">150.00</span> LKR
+                                </h5>
+                                <small class="text-muted">per <span th:text="${product.unit}">kg</span></small>
+                            </div>
+                            <!-- Cart button will go here in Cart Management Sprint -->
+                            <button class="btn btn-outline-success btn-sm disabled">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(products)}" class="col-12 text-center py-5">
+                <h3 class="text-muted">No products available at the moment.</h3>
+                <p>Please check back later!</p>
+            </div>
+            
+        </div>
+    </div>
+</body>
+</html>
