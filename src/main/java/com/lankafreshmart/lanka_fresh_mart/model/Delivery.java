@@ -12,7 +12,8 @@ public class Delivery {
     public enum Status {
         PREPARING,
         DISPATCHED,
-        DELIVERED
+        DELIVERED,
+        CANCELLED
     }
 
     @Id
