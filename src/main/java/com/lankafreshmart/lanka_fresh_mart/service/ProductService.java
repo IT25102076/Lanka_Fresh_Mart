@@ -75,7 +75,15 @@ public class ProductService {
     @Transactional
     public void hardDeleteProduct(Long id) {
         Product product = getProductById(id);
-        inventoryAlertRepository.deleteByProduct(product);
-        productRepository.deleteById(id);
+        try {
+            inventoryAlertRepository.deleteByProduct(product);
+            productRepository.deleteById(id);
+            productRepository.flush(); // Force immediate execution to catch foreign key constraints
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // Fallback to soft delete if it's already used in Orders
+            product.setAvailability(Product.Availability.UNAVAILABLE);
+            productRepository.save(product);
+            throw new RuntimeException("Product is linked to existing data (like Orders or Carts). It has been safely Discontinued instead of permanently deleted.");
+        }
     }
 }
