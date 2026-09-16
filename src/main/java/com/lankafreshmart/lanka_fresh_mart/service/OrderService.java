@@ -97,8 +97,11 @@ public class OrderService {
             deliveryRepository.delete(delivery);
         });
 
-        // Remove associated refund if exists to prevent foreign key errors
+        // Check if there is a pending refund, block deletion if so
         refundRepository.findByOrderId(orderId).ifPresent(refund -> {
+            if (refund.getStatus() == com.lankafreshmart.lanka_fresh_mart.model.Refund.Status.PENDING) {
+                throw new RuntimeException("You must process the pending refund for this order before it can be deleted.");
+            }
             refundRepository.delete(refund);
         });
 
