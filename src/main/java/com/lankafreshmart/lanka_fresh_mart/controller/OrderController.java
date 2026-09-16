@@ -65,4 +65,15 @@ public class OrderController {
         }
         return "redirect:/orders/manage";
     }
+
+    @PostMapping("/manage/delete/{id}")
+    public String adminHardDeleteOrder(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            orderService.hardDeleteOrder(id);
+            redirectAttributes.addFlashAttribute("success", "Order #" + id + " was permanently deleted from the database.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error deleting order: " + e.getMessage());
+        }
+        return "redirect:/orders/manage";
+    }
 }

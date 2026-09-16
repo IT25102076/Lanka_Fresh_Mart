@@ -14,9 +14,12 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
+    private final com.lankafreshmart.lanka_fresh_mart.service.ProductService productService;
+
     @GetMapping("/alerts")
     public String viewAlerts(Model model) {
         model.addAttribute("alerts", inventoryService.getActiveAlerts());
+        model.addAttribute("products", productService.getAllProducts());
         return "inventory/alerts";
     }
 
@@ -34,6 +37,28 @@ public class InventoryController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         
+        return "redirect:/inventory/alerts";
+    }
+
+    @PostMapping("/alerts/create")
+    public String createManualAlert(@RequestParam Long productId, @RequestParam String message, RedirectAttributes redirectAttributes) {
+        try {
+            inventoryService.createManualAlert(productId, message);
+            redirectAttributes.addFlashAttribute("success", "Manual inventory alert created successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to create alert: " + e.getMessage());
+        }
+        return "redirect:/inventory/alerts";
+    }
+
+    @PostMapping("/alerts/dismiss/{alertId}")
+    public String dismissAlert(@PathVariable Long alertId, RedirectAttributes redirectAttributes) {
+        try {
+            inventoryService.dismissAlert(alertId);
+            redirectAttributes.addFlashAttribute("success", "Alert successfully dismissed and deleted from the database.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to dismiss alert: " + e.getMessage());
+        }
         return "redirect:/inventory/alerts";
     }
 }

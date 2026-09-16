@@ -83,4 +83,19 @@ public class OrderService {
         // Automatically create a pending refund for the cancelled order
         refundService.createRefundForOrder(order);
     }
+
+    @Transactional
+    public void hardDeleteOrder(Long orderId) {
+        Order order = getOrderById(orderId);
+        if (order.getStatus() != Order.Status.CANCELLED) {
+            throw new RuntimeException("Only cancelled orders can be permanently deleted.");
+        }
+        
+        // Remove associated delivery if exists to prevent foreign key errors
+        deliveryRepository.findByOrderId(orderId).ifPresent(delivery -> {
+            deliveryRepository.delete(delivery);
+        });
+
+        orderRepository.delete(order);
+    }
 }
