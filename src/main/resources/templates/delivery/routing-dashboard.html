@@ -30,6 +30,23 @@
             </div>
         </div>
 
+        <!-- Pending Deliveries to Route -->
+        <div class="card shadow-sm mb-4 border-warning" th:if="${not #lists.isEmpty(pendingDeliveries)}">
+            <div class="card-header bg-warning text-dark fw-bold">
+                <i class="bi bi-clock-history"></i> Pending Deliveries Waiting for Routing (<span th:text="${pendingDeliveries.size()}"></span>)
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center" th:each="delivery : ${pendingDeliveries}">
+                        <span>
+                            <strong>Order #<span th:text="${delivery.order.id}"></span></strong> - <span th:text="${delivery.deliveryAddress}"></span>
+                        </span>
+                        <span class="badge bg-secondary rounded-pill" th:text="${delivery.status}"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
         <!-- Routes Display -->
         <div class="row" th:if="${not #lists.isEmpty(routes)}">
             <div class="col-md-6 mb-4" th:each="route : ${routes}">
@@ -39,12 +56,20 @@
                             <h5 class="mb-0 d-inline me-2" th:text="${route.routeName}">Route Name</h5>
                             <span class="badge bg-light text-primary" th:text="${route.status}">STATUS</span>
                         </div>
-                        <form th:action="@{/routing/delete/{id}(id=${route.id})}" method="post" class="m-0">
-                            <input type="hidden" name="date" th:value="${selectedDate}">
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this route? Deliveries will be marked pending again.');">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
+                        <div class="d-flex gap-2">
+                            <form th:action="@{/routing/complete/{id}(id=${route.id})}" method="post" class="m-0" th:if="${route.status.name() == 'IN_PROGRESS'}">
+                                <input type="hidden" name="date" th:value="${selectedDate}">
+                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Mark this route as COMPLETED and set all deliveries to DELIVERED?');">
+                                    <i class="bi bi-check-circle"></i> Complete
+                                </button>
+                            </form>
+                            <form th:action="@{/routing/delete/{id}(id=${route.id})}" method="post" class="m-0">
+                                <input type="hidden" name="date" th:value="${selectedDate}">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this route? Deliveries will be marked pending again.');">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                     <div class="card-body">
                         <p class="mb-2"><strong><i class="bi bi-calendar"></i> Date:</strong> <span th:text="${#temporals.format(route.scheduledDate, 'dd-MM-yyyy')}"></span></p>

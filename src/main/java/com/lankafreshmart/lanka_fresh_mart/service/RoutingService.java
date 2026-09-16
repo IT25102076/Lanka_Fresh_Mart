@@ -21,9 +21,7 @@ public class RoutingService {
 
     private static final int MAX_DELIVERIES_PER_ROUTE = 5;
 
-    @Transactional
-    public void optimizeRoutesForDate(LocalDate date) {
-        // Find all deliveries for this date that don't have a route yet
+    public List<Delivery> getPendingDeliveriesForDate(LocalDate date) {
         List<Delivery> allDeliveries = deliveryRepository.findAll();
         List<Delivery> pendingDeliveries = new ArrayList<>();
         
@@ -32,6 +30,13 @@ public class RoutingService {
                 pendingDeliveries.add(d);
             }
         }
+        return pendingDeliveries;
+    }
+
+    @Transactional
+    public void optimizeRoutesForDate(LocalDate date) {
+        // Find all deliveries for this date that don't have a route yet
+        List<Delivery> pendingDeliveries = getPendingDeliveriesForDate(date);
 
         if (pendingDeliveries.isEmpty()) {
             return; // Nothing to route
@@ -79,6 +84,24 @@ public class RoutingService {
         route.setDriverName(driverName);
         route.setStatus(DeliveryRoute.Status.IN_PROGRESS);
         routeRepository.save(route);
+    }
+
+    @Transactional
+    public void completeRoute(Long routeId) {
+        DeliveryRoute route = routeRepository.findById(routeId)
+                .orElseThrow(() -> new RuntimeException("Route not found"));
+        
+        if (route.getStatus() != DeliveryRoute.Status.IN_PROGRESS) {
+            throw new RuntimeException("Only IN_PROGRESS routes can be completed.");
+        }
+
+        route.setStatus(DeliveryRoute.Status.COMPLETED);
+        routeRepository.save(route);
+
+        for (Delivery delivery : route.getDeliveries()) {
+            delivery.setStatus(Delivery.Status.DELIVERED);
+            deliveryRepository.save(delivery);
+        }
     }
 
     @Transactional

@@ -22,6 +22,7 @@ public class RoutingController {
         
         model.addAttribute("selectedDate", selectedDate);
         model.addAttribute("routes", routingService.getRoutesForDate(selectedDate));
+        model.addAttribute("pendingDeliveries", routingService.getPendingDeliveriesForDate(selectedDate));
         
         return "delivery/routing-dashboard";
     }
@@ -50,6 +51,17 @@ public class RoutingController {
             redirectAttributes.addFlashAttribute("success", "Driver successfully assigned to route!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/routing/dashboard?date=" + date;
+    }
+
+    @PostMapping("/complete/{routeId}")
+    public String completeRoute(@PathVariable Long routeId, @RequestParam String date, RedirectAttributes redirectAttributes) {
+        try {
+            routingService.completeRoute(routeId);
+            redirectAttributes.addFlashAttribute("success", "Route successfully completed! All deliveries marked as delivered.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error completing route: " + e.getMessage());
         }
         return "redirect:/routing/dashboard?date=" + date;
     }
