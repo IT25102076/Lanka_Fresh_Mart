@@ -64,10 +64,10 @@
                     <li class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('STORE_SUPERVISOR')">
                         <a class="nav-link" th:href="@{/products/manage}">Manage Products</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('STORE_SUPERVISOR') or hasAuthority('DELIVERY_COORDINATOR') or hasAuthority('OPERATIONS_MANAGER')">
+                    <li class="nav-item" sec:authorize="hasAuthority('DELIVERY_COORDINATOR') or hasAuthority('OPERATIONS_MANAGER')">
                         <a class="nav-link" th:href="@{/deliveries/manage}">Manage Deliveries</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('STORE_SUPERVISOR') or hasAuthority('DELIVERY_COORDINATOR') or hasAuthority('OPERATIONS_MANAGER')">
+                    <li class="nav-item" sec:authorize="hasAuthority('DELIVERY_COORDINATOR') or hasAuthority('OPERATIONS_MANAGER')">
                         <a class="nav-link" th:href="@{/drivers}">Manage Drivers</a>
                     </li>
 
