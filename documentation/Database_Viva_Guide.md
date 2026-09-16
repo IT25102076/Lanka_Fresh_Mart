@@ -1,51 +1,85 @@
-# Viva Demonstration Guide: UI, Database & Validations
+# 🎯 Lanka Fresh Mart — Viva Cheat Sheet
 
-This guide shows exactly how each team member can demonstrate their specific module during the viva. For each member, it provides:
-1. **The UI Steps:** How to log in and what to click to perform CRUD (Create, Read, Update, Delete) operations.
-2. **The Database Proof:** The exact SQL query to run in MySQL Workbench to prove the data actually changed in the backend.
-3. **The Validations:** How the system protects data integrity — what happens when you try to break the rules.
-
-> **Tip:** You can use the `⚡ Fast Switch` dropdown in the top navigation bar to quickly jump between accounts without typing passwords! All manual logins use the password: `password123`.
+> 💡 **Quick Login:** Use `⚡ Fast Switch` dropdown in the navbar — no passwords needed!  
+> 🔑 **Manual Login Password:** `password123` (for all accounts)
 
 ---
 
-## 1. Order Management (Padmakumara I. M. M. D)
+## 👤 Quick Account Reference
 
-### UI Demonstration:
-* **Account:** Log in as **Customer Relations** (`support@test.com`).
-* **Action (Read/Update/Delete):** Click on **"Manage Orders"** in the navigation bar. You can view all orders, use the dropdown to change an order status (e.g., from PENDING to PROCESSING), or click "Cancel Order" (which acts as a delete/cancellation).
-* *(To Create an order, use the Customer account below).*
+| Role | Email | Modules |
+|:-----|:------|:--------|
+| 🛒 Customer | `customer@test.com` | Cart, Orders, Checkout, Support |
+| 📋 Customer Relations | `support@test.com` | Manage Orders, Manage Support |
+| 🚚 Delivery Coordinator | `delivery@test.com` | Manage Deliveries, Manage Drivers |
+| 💰 Finance Executive | `finance@test.com` | Finance Dashboard, Process Refunds |
+| 🏪 Store Supervisor | `supervisor@test.com` | Manage Products, Inventory Alerts |
+| 👑 Operations Manager | `operations@test.com` | All of the above |
 
-### Validations to Demonstrate:
-* **Cancel Confirmation:** Clicking "Cancel Order" shows a browser confirmation dialog: *"Are you sure you want to CANCEL this order?"*
-* **Delete Confirmation:** Clicking "Delete" shows: *"Are you sure you want to PERMANENTLY DELETE this order?"*
-* **Status-Based Deletion:** Only cancelled orders can be permanently deleted. If you try to delete a non-cancelled order, it will be blocked.
-* **Refund Block:** If a cancelled order has a pending refund, deletion is blocked with the message: *"You must process the pending refund for this order before it can be deleted."*
-* **Authorization Check:** Customers can only cancel their own orders. Trying to cancel another user's order is blocked.
+---
 
-### Database Proof:
-In MySQL Workbench, run this query to show the orders being updated/inserted:
+## 1️⃣ Order Management — Padmakumara I. M. M. D
+
+> 🔐 Login: **Customer Relations** → `support@test.com`  
+> 📍 Navigate: **Manage Orders**
+
+### 🖱️ CRUD Steps
+
+| Action | How |
+|:-------|:----|
+| **C** reate | Use Customer account → add items → checkout → pay |
+| **R** ead | View all orders in the table |
+| **U** pdate | Change status dropdown (PENDING → PROCESSING → SHIPPED) → click Save |
+| **D** elete | Click **Cancel Order** → then click **Delete** on cancelled orders |
+
+### 🛡️ Validations
+
+| What to Try | What Happens |
+|:------------|:-------------|
+| Click **Cancel Order** | ⚠️ Confirmation: *"Are you sure you want to CANCEL this order?"* |
+| Click **Delete** on active order | ❌ Blocked — *"Only cancelled orders can be permanently deleted."* |
+| Delete order with pending refund | ❌ Blocked — *"You must process the pending refund before it can be deleted."* |
+| Cancel another user's order | ❌ Blocked — *"You are not authorized to cancel this order."* |
+
+### 💾 SQL Proof
 ```sql
 SELECT * FROM orders ORDER BY created_at DESC;
 ```
 
 ---
 
-## 2. Delivery & Driver Management (Nambikandage D. A.)
+## 2️⃣ Delivery & Driver Management — Nambikandage D. A.
 
-### UI Demonstration:
-* **Account:** Log in as **Delivery Coordinator** (`delivery@test.com`).
-* **Action (Driver CRUD):** Click on **"Manage Drivers"**. Click **"Add New Driver"** to create a driver (*Create*). View all drivers in the list (*Read*). Click the **edit icon** to update a driver's name, phone, or vehicle type (*Update*). Click the **delete icon** to remove a driver (*Delete*).
-* **Action (Delivery Status Management):** Click on **"Manage Deliveries"**. The page is split into three sections: **Preparing**, **Dispatched**, and **Delivered**. Use the dropdowns to assign a driver and change the status (e.g., PREPARING → DISPATCHED → DELIVERED).
+> 🔐 Login: **Delivery Coordinator** → `delivery@test.com`  
+> 📍 Navigate: **Manage Drivers** + **Manage Deliveries**
 
-### Validations to Demonstrate:
-* **Driver Delete Block:** If a driver has active deliveries assigned, deletion is blocked with the message: *"Cannot delete driver because they have active deliveries or routes assigned."* — Demonstrate by assigning a driver to a delivery, then trying to delete that driver.
-* **Delete Confirmation:** Clicking the delete icon on a driver shows a browser confirmation: *"Delete this driver?"*
-* **Required Fields:** The driver form requires Name and Phone Number — submitting without them is blocked by the browser.
-* **Unique Phone:** Each driver must have a unique phone number. Adding a duplicate will show an error.
+### 🖱️ CRUD Steps — Drivers
 
-### Database Proof:
-In MySQL Workbench, run these queries to show drivers and deliveries updating:
+| Action | How |
+|:-------|:----|
+| **C** reate | Click **Add New Driver** → fill Name, Phone, Vehicle Type → Save |
+| **R** ead | View all drivers in the list with assignment counts |
+| **U** pdate | Click ✏️ edit icon → change details → Update Driver |
+| **D** elete | Click 🗑️ delete icon → confirm |
+
+### 🖱️ Delivery Status Flow
+
+```
+📦 PREPARING  →  🚛 DISPATCHED  →  ✅ DELIVERED
+```
+
+> Each status has its own section on the page. Use the **status dropdown** + **driver dropdown** → click **Save**.
+
+### 🛡️ Validations
+
+| What to Try | What Happens |
+|:------------|:-------------|
+| Delete driver **with** active deliveries | ❌ Blocked — *"Cannot delete driver because they have active deliveries assigned."* |
+| Delete driver **without** deliveries | ✅ Deleted successfully |
+| Submit driver form with empty name | ❌ Browser blocks — fields are required |
+| Add driver with duplicate phone | ❌ Error — phone must be unique |
+
+### 💾 SQL Proof
 ```sql
 SELECT * FROM drivers;
 SELECT * FROM deliveries;
@@ -53,80 +87,121 @@ SELECT * FROM deliveries;
 
 ---
 
-## 3. Inventory Management (Ananya P. K. O.)
+## 3️⃣ Inventory Management — Ananya P. K. O.
 
-### UI Demonstration:
-* **Account:** Log in as **Store Supervisor** (`supervisor@test.com`).
-* **Action (Create/Read/Update/Delete):** Click on the red **"Inventory Alerts"** link. You can demonstrate clicking "Resolve" on an alert (which updates/deletes it from the active list). To *Create* an alert, simply go to Manage Products and edit a product so its stock is lower than its Reorder Level!
+> 🔐 Login: **Store Supervisor** → `supervisor@test.com`  
+> 📍 Navigate: **Inventory Alerts** (red link in navbar)
 
-### Validations to Demonstrate:
-* **Dismiss Confirmation:** Clicking "Dismiss" on an alert shows: *"Are you sure you want to dismiss this alert?"*
-* **Required Fields:** The restock form requires a restock amount with a minimum value of 1. The manual alert form requires both a product selection and a message.
-* **Auto-Alert Creation:** Alerts are automatically created when a product's stock drops below its reorder level — no manual trigger needed.
+### 🖱️ CRUD Steps
 
-### Database Proof:
-In MySQL Workbench, run this query to show alerts being created and resolved:
+| Action | How |
+|:-------|:----|
+| **C** reate (auto) | Edit a product → set stock **below** reorder level → alert auto-created! |
+| **C** reate (manual) | Use "Create Manual Alert" form at the bottom |
+| **R** ead | View all active alerts in the table |
+| **U** pdate | Click **Resolve** → enter restock amount → stock gets replenished |
+| **D** elete | Click the ✕ dismiss button on any alert |
+
+### 🛡️ Validations
+
+| What to Try | What Happens |
+|:------------|:-------------|
+| Click **Dismiss** on an alert | ⚠️ Confirmation: *"Are you sure you want to dismiss this alert?"* |
+| Submit restock with amount 0 | ❌ Browser blocks — minimum value is 1 |
+| Submit manual alert without message | ❌ Browser blocks — fields are required |
+
+### 💾 SQL Proof
 ```sql
 SELECT * FROM inventory_alerts;
 ```
 
 ---
 
-## 4. Finance / Payment Management (Fernando N. A. S.)
+## 4️⃣ Finance / Payment Management — Fernando N. A. S.
 
-### UI Demonstration:
-* **Account:** Log in as **Finance Executive** (`finance@test.com`).
-* **Action (Create/Read/Update/Delete):** Click on **"Finance Dashboard"**. Scroll down to the "Log New Expense" form to *Create* an expense (e.g., "Electricity Bill", 15000). Use the table on the right to *Edit* or *Delete* existing expenses. Notice the charts update dynamically!
+> 🔐 Login: **Finance Executive** → `finance@test.com`  
+> 📍 Navigate: **Finance Dashboard** + **Process Refunds**
 
-### Validations to Demonstrate:
-* **Delete Confirmation:** Clicking "Delete" on an expense shows: *"Are you sure you want to delete this expense?"*
-* **Required Fields:** The expense form requires both Description and Amount — submitting without them is blocked.
-* **Refund Process Confirmation:** On the "Process Refunds" page, clicking "Process" shows: *"Confirm processing this refund? Funds should be manually sent to the customer before clicking this."*
-* **Double Refund Block:** If a refund is already completed (COMPLETED status), trying to process it again is blocked with: *"Refund is already completed."*
+### 🖱️ CRUD Steps — Expenses
 
-### Database Proof:
-In MySQL Workbench, run this query to prove the expenses table is updating:
+| Action | How |
+|:-------|:----|
+| **C** reate | Scroll to "Log New Expense" → enter description + amount → Save |
+| **R** ead | View expense table + charts update dynamically |
+| **U** pdate | Click ✏️ on an expense → edit inline → Save |
+| **D** elete | Click 🗑️ on an expense → confirm |
+
+### 🛡️ Validations
+
+| What to Try | What Happens |
+|:------------|:-------------|
+| Delete an expense | ⚠️ Confirmation: *"Are you sure you want to delete this expense?"* |
+| Submit expense without description | ❌ Browser blocks — fields are required |
+| Process a refund | ⚠️ Confirmation: *"Confirm processing this refund?"* |
+| Process an **already completed** refund | ❌ Blocked — *"Refund is already completed."* |
+
+### 💾 SQL Proof
 ```sql
 SELECT * FROM expenses ORDER BY date_added DESC;
 ```
 
 ---
 
-## 5. Product Management (Balasuriya B. M. S. H)
+## 5️⃣ Product Management — Balasuriya B. M. S. H
 
-### UI Demonstration:
-* **Account:** Log in as **Store Supervisor** (`supervisor@test.com`).
-* **Action (Create/Read/Update/Delete):** Click on **"Manage Products"**. Click the blue **"Add New Product"** button to create one. Click **"Edit"** on a product to change its price or stock. Click the red **"Delete"** button to completely erase it from the system. *(Note: If a customer has already ordered the product, clicking Delete will safely "Discontinue" it instead to protect the database!)*
+> 🔐 Login: **Store Supervisor** → `supervisor@test.com`  
+> 📍 Navigate: **Manage Products**
 
-### Validations to Demonstrate:
-* **Safe Discontinue:** If a product is linked to existing orders or carts, clicking "Delete" will NOT delete it — it will change its status to **DISCONTINUED** instead, with the message: *"Product is linked to existing data. It has been safely Discontinued instead of permanently deleted."*
-* **Delete Confirmation:** Clicking "Delete" shows: *"Are you sure you want to discontinue this product?"* and hard delete shows: *"Are you sure you want to COMPLETELY DELETE this product?"*
-* **Required Fields:** The product form requires Name, Category, Price, Unit, Availability, Quantity on Hand, and Reorder Level — all validated by the browser.
+### 🖱️ CRUD Steps
 
-### Database Proof:
-In MySQL Workbench, run this query to prove the product row was inserted or deleted:
+| Action | How |
+|:-------|:----|
+| **C** reate | Click **Add New Product** → fill all fields → Save |
+| **R** ead | View all products in the table |
+| **U** pdate | Click **Edit** → change price, stock, etc. → Save |
+| **D** elete | Click **Delete** → if linked to orders, it **Discontinues** instead |
+
+### 🛡️ Validations
+
+| What to Try | What Happens |
+|:------------|:-------------|
+| Delete product **with** existing orders | 🔄 Auto-Discontinue — *"Product is linked to existing data. It has been safely Discontinued."* |
+| Delete product **without** orders | ✅ Permanently deleted |
+| Hard delete confirmation | ⚠️ *"Are you sure you want to COMPLETELY DELETE this product?"* |
+| Submit product form with empty name | ❌ Browser blocks — all fields required |
+
+### 💾 SQL Proof
 ```sql
 SELECT * FROM products;
 ```
 
 ---
 
-## 6. Cart Management (Ranasinghe R A I M)
+## 6️⃣ Cart Management — Ranasinghe R A I M
 
-### UI Demonstration:
-* **Account:** Log in as **Customer** (`customer@test.com`).
-* **Action (Create/Read/Update/Delete):** Click on **"Products"** to browse the catalogue, and click "Add to Cart" (*Create*). Click on **"Cart"** in the top navigation. Change the quantity of an item and click update (*Update*), or click "Remove" to delete it from the cart (*Delete*).
+> 🔐 Login: **Customer** → `customer@test.com`  
+> 📍 Navigate: **Products** → **Cart**
 
-### Validations to Demonstrate:
-* **Stock Check on Add:** If a product is unavailable or has insufficient stock, adding to cart is blocked with: *"Product is unavailable or insufficient stock."*
-* **Stock Check on Update:** If you try to increase the quantity beyond available stock, it's blocked with: *"Insufficient stock for requested quantity."*
-* **Empty Cart Confirmation:** Clicking "Empty Cart" shows: *"Are you sure you want to empty your cart?"*
-* **Authorization Check:** Users can only modify their own cart items. The system checks ownership before any update or delete.
-* **Empty Cart Checkout Block:** Trying to checkout with an empty cart is blocked.
-* **Delivery Address Required:** The checkout form requires a delivery address before proceeding to payment.
+### 🖱️ CRUD Steps
 
-### Database Proof:
-In MySQL Workbench, run these queries to prove the cart items are being managed in the database:
+| Action | How |
+|:-------|:----|
+| **C** reate | Browse Products → click **Add to Cart** |
+| **R** ead | Click **Cart** in navbar → view all items |
+| **U** pdate | Change quantity → click **Update** |
+| **D** elete | Click **Remove** on an item, or **Empty Cart** for all |
+
+### 🛡️ Validations
+
+| What to Try | What Happens |
+|:------------|:-------------|
+| Add out-of-stock product | ❌ Blocked — *"Product is unavailable or insufficient stock."* |
+| Update quantity beyond stock | ❌ Blocked — *"Insufficient stock for requested quantity."* |
+| Click **Empty Cart** | ⚠️ Confirmation: *"Are you sure you want to empty your cart?"* |
+| Checkout with empty cart | ❌ Blocked — *"Cart is empty."* |
+| Checkout without delivery address | ❌ Browser blocks — address is required |
+
+### 💾 SQL Proof
 ```sql
 SELECT * FROM carts;
 SELECT * FROM cart_items;
@@ -134,8 +209,9 @@ SELECT * FROM cart_items;
 
 ---
 
-### How to use MySQL Workbench during the viva:
-1. Double-click on `lanka_fresh_mart` under "SCHEMAS" on the left side so it becomes bold.
-2. Paste all the SQL queries above into the large "Query 1" text area.
-3. Highlight only the specific line of SQL you want to run.
-4. Click the plain yellow **Lightning Bolt icon ⚡** above the text area to execute that specific line and view the data!
+## 🖥️ How to Use MySQL Workbench
+
+1. Double-click `lanka_fresh_mart` under **SCHEMAS** (left panel) so it becomes **bold**
+2. Paste the SQL queries into the **Query** tab
+3. **Highlight** only the line you want to run
+4. Click the ⚡ **Lightning Bolt** icon to execute and see results!
