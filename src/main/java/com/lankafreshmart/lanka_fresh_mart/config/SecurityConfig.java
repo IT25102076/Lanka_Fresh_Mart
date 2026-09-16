@@ -22,7 +22,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 // Public pages — anyone can access
-                .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/", "/register", "/login", "/fast-switch", "/css/**", "/js/**", "/images/**").permitAll()
                 // Role-based access
                 .requestMatchers("/products/manage/**").hasAnyAuthority("STORE_SUPERVISOR", "OPERATIONS_MANAGER")
                 .requestMatchers("/inventory/**").hasAnyAuthority("STORE_SUPERVISOR", "OPERATIONS_MANAGER")
@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .requestMatchers("/delivery/**").hasAnyAuthority("DELIVERY_COORDINATOR", "OPERATIONS_MANAGER")
                 .requestMatchers("/payments/**").hasAnyAuthority("FINANCE_EXECUTIVE", "OPERATIONS_MANAGER")
                 .requestMatchers("/dashboard/**").hasAuthority("OPERATIONS_MANAGER")
-                .requestMatchers("/cart/**", "/orders/my/**").hasAuthority("CUSTOMER")
+                .requestMatchers("/cart/**", "/orders/my/**", "/checkout/**").hasAuthority("CUSTOMER")
                 // Everything else requires login
                 .anyRequest().authenticated()
             )

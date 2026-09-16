@@ -15,7 +15,14 @@
                 <div class="card shadow-sm border-danger h-100">
                     <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
                         <span class="fw-bold" th:text="${alert.product.name}">Product Name</span>
-                        <span class="badge bg-light text-danger">Stock: <span th:text="${alert.product.quantityOnHand}">0</span></span>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-light text-danger me-2">Stock: <span th:text="${alert.product.quantityOnHand}">0</span></span>
+                            <form th:action="@{/inventory/alerts/dismiss/{id}(id=${alert.id})}" method="post" class="m-0">
+                                <button type="submit" class="btn btn-sm btn-outline-light border-0" title="Dismiss Alert" onclick="return confirm('Are you sure you want to dismiss this alert?');">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                     <div class="card-body">
                         <p class="card-text text-danger fw-bold mb-3" th:text="${alert.alertMessage}">Alert message here</p>
@@ -32,6 +39,31 @@
                 </div>
             </div>
         </div>
+
+        <div class="card shadow-sm mb-5 border-info">
+            <div class="card-header bg-info text-white fw-bold">
+                <i class="bi bi-plus-circle"></i> Create Manual Alert
+            </div>
+            <div class="card-body">
+                <form th:action="@{/inventory/alerts/create}" method="post" class="row align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Product</label>
+                        <select name="productId" class="form-select" required>
+                            <option value="">Select a product...</option>
+                            <option th:each="product : ${products}" th:value="${product.id}" th:text="${product.name}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Alert Message</label>
+                        <input type="text" name="message" class="form-control" placeholder="e.g., Stock mismatch detected" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-info text-white w-100">Create Alert</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
 
         <div th:if="${#lists.isEmpty(alerts)}" class="text-center py-5">
             <div class="display-1 text-success mb-3"><i class="bi bi-check-circle-fill"></i></div>

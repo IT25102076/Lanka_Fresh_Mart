@@ -14,6 +14,8 @@ import java.util.UUID;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final InventoryService inventoryService;
+    private final com.lankafreshmart.lanka_fresh_mart.repository.InventoryAlertRepository inventoryAlertRepository;
 
     public List<Product> getAllProducts() {
         return productRepository.findAll();
@@ -33,7 +35,9 @@ public class ProductService {
         if (product.getProductCode() == null || product.getProductCode().isEmpty()) {
             product.setProductCode("PRD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         }
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        inventoryService.checkAndCreateAlert(savedProduct);
+        return savedProduct;
     }
 
     @Transactional
@@ -50,7 +54,9 @@ public class ProductService {
         existingProduct.setReorderLevel(updatedProduct.getReorderLevel());
         existingProduct.setAvailability(updatedProduct.getAvailability());
         
-        return productRepository.save(existingProduct);
+        Product savedProduct = productRepository.save(existingProduct);
+        inventoryService.checkAndCreateAlert(savedProduct);
+        return savedProduct;
     }
 
     @Transactional
@@ -64,5 +70,12 @@ public class ProductService {
             existingProduct.setAvailability(Product.Availability.UNAVAILABLE);
             productRepository.save(existingProduct);
         }
+    }
+
+    @Transactional
+    public void hardDeleteProduct(Long id) {
+        Product product = getProductById(id);
+        inventoryAlertRepository.deleteByProduct(product);
+        productRepository.deleteById(id);
     }
 }

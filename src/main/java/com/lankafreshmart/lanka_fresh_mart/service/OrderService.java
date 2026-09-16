@@ -21,6 +21,8 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final RefundService refundService;
+    private final com.lankafreshmart.lanka_fresh_mart.repository.DeliveryRepository deliveryRepository;
 
     public List<Order> getAllOrders() {
         return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -71,5 +73,29 @@ public class OrderService {
 
         order.setStatus(Order.Status.CANCELLED);
         orderRepository.save(order);
+        
+        // Cancel the associated delivery if it exists
+        deliveryRepository.findByOrderId(orderId).ifPresent(delivery -> {
+            delivery.setStatus(com.lankafreshmart.lanka_fresh_mart.model.Delivery.Status.CANCELLED);
+            deliveryRepository.save(delivery);
+        });
+        
+        // Automatically create a pending refund for the cancelled order
+        refundService.createRefundForOrder(order);
+    }
+
+    @Transactional
+    public void hardDeleteOrder(Long orderId) {
+        Order order = getOrderById(orderId);
+        if (order.getStatus() != Order.Status.CANCELLED) {
+            throw new RuntimeException("Only cancelled orders can be permanently deleted.");
+        }
+        
+        // Remove associated delivery if exists to prevent foreign key errors
+        deliveryRepository.findByOrderId(orderId).ifPresent(delivery -> {
+            deliveryRepository.delete(delivery);
+        });
+
+        orderRepository.delete(order);
     }
 }
