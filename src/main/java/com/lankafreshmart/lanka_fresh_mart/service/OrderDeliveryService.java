@@ -33,7 +33,7 @@ public class OrderDeliveryService {
         BigDecimal total = BigDecimal.ZERO;
         Order order = new Order();
         order.setUser(cart.getUser());
-        order.setStatus(Order.Status.CONFIRMED); // Auto confirm for now
+        order.setStatus(Order.Status.PENDING); // Initially pending so it can be cancelled
 
         // Process items and reduce stock
         for (CartItem cartItem : cart.getItems()) {
@@ -80,11 +80,20 @@ public class OrderDeliveryService {
     public List<Delivery> getUserDeliveries(String username) {
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return deliveryRepository.findByOrderUserOrderByCreatedAtDesc(user);
+        List<Delivery> deliveries = deliveryRepository.findByOrderUserOrderByCreatedAtDesc(user);
+        
+        // Hide deliveries for cancelled orders from the tracking page
+        return deliveries.stream()
+                .filter(d -> d.getOrder().getStatus() != Order.Status.CANCELLED)
+                .collect(java.util.stream.Collectors.toList());
     }
 
     public List<Delivery> getAllDeliveries() {
-        return deliveryRepository.findAll();
+        List<Delivery> allDeliveries = deliveryRepository.findAll();
+        // Don't assign or show deliveries for cancelled orders to the delivery coordinator
+        return allDeliveries.stream()
+                .filter(d -> d.getOrder().getStatus() != Order.Status.CANCELLED)
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @Transactional

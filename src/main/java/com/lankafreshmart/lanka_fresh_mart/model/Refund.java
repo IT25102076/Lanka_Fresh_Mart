@@ -2,18 +2,17 @@ package com.lankafreshmart.lanka_fresh_mart.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "deliveries")
+@Table(name = "refunds")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-public class Delivery {
+public class Refund {
 
     public enum Status {
-        PREPARING,
-        DISPATCHED,
-        DELIVERED,
-        CANCELLED
+        PENDING,
+        COMPLETED
     }
 
     @Id
@@ -24,32 +23,23 @@ public class Delivery {
     @JoinColumn(name = "order_id", nullable = false, unique = true)
     private Order order;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String deliveryAddress;
-
-    private LocalDateTime scheduledDate;
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delivery_route_id")
-    private DeliveryRoute deliveryRoute;
-
     @Column(updatable = false)
     private LocalDateTime createdAt;
     
-    private LocalDateTime updatedAt;
+    private LocalDateTime processedAt;
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        if (this.status == null) {
+            this.status = Status.PENDING;
+        }
     }
 }

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<head>
+    <title>Process Refunds - Lanka Fresh Mart</title>
+</head>
+<body>
+    <div class="container-fluid my-4">
+        <h2 class="mb-4"><i class="bi bi-cash-stack text-warning"></i> Refund Management</h2>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Refund #</th>
+                                <th>Generated Date</th>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Amount (LKR)</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(refunds)}">
+                                <td colspan="7" class="text-center py-5 text-muted">No refunds found.</td>
+                            </tr>
+                            <tr th:each="refund : ${refunds}">
+                                <td><strong th:text="${'REF-' + refund.id}"></strong></td>
+                                <td th:text="${#temporals.format(refund.createdAt, 'dd-MM-yyyy HH:mm')}"></td>
+                                <td>
+                                    <a th:href="@{/orders/manage}" class="text-decoration-none" th:text="${'ORD-' + refund.order.id}"></a>
+                                </td>
+                                <td>
+                                    <span th:text="${refund.order.user.firstName + ' ' + refund.order.user.lastName}"></span><br>
+                                    <small class="text-muted" th:text="${refund.order.user.email}"></small>
+                                </td>
+                                <td class="fw-bold text-danger" th:text="${refund.amount}"></td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${refund.status.name() == 'PENDING' ? 'bg-warning text-dark' : 'bg-success'}"
+                                          th:text="${refund.status}">
+                                    </span><br>
+                                    <small class="text-muted" th:if="${refund.status.name() == 'COMPLETED'}" 
+                                           th:text="${'Processed: ' + #temporals.format(refund.processedAt, 'dd-MM-yyyy HH:mm')}"></small>
+                                </td>
+                                <td class="text-end">
+                                    <form th:if="${refund.status.name() == 'PENDING'}" th:action="@{/finance/refunds/process/{id}(id=${refund.id})}" method="post" class="d-inline" onsubmit="return confirm('Confirm processing this refund? Funds should be manually sent to the customer before clicking this.');">
+                                        <button type="submit" class="btn btn-sm btn-success">
+                                            <i class="bi bi-check-circle"></i> Mark as Processed
+                                        </button>
+                                    </form>
+                                    <span th:if="${refund.status.name() == 'COMPLETED'}" class="text-success fw-bold">
+                                        <i class="bi bi-check2-all"></i> Done
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
