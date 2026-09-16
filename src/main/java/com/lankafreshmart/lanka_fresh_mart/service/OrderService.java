@@ -23,6 +23,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final RefundService refundService;
     private final com.lankafreshmart.lanka_fresh_mart.repository.DeliveryRepository deliveryRepository;
+    private final com.lankafreshmart.lanka_fresh_mart.repository.RefundRepository refundRepository;
 
     public List<Order> getAllOrders() {
         return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -94,6 +95,11 @@ public class OrderService {
         // Remove associated delivery if exists to prevent foreign key errors
         deliveryRepository.findByOrderId(orderId).ifPresent(delivery -> {
             deliveryRepository.delete(delivery);
+        });
+
+        // Remove associated refund if exists to prevent foreign key errors
+        refundRepository.findByOrderId(orderId).ifPresent(refund -> {
+            refundRepository.delete(refund);
         });
 
         orderRepository.delete(order);
