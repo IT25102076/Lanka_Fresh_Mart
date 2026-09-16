@@ -80,4 +80,19 @@ public class RoutingService {
         route.setStatus(DeliveryRoute.Status.IN_PROGRESS);
         routeRepository.save(route);
     }
+
+    @Transactional
+    public void deleteRoute(Long routeId) {
+        DeliveryRoute route = routeRepository.findById(routeId)
+                .orElseThrow(() -> new RuntimeException("Route not found"));
+
+        // Unlink deliveries and set them back to pending
+        for (Delivery delivery : route.getDeliveries()) {
+            delivery.setDeliveryRoute(null);
+            delivery.setStatus(Delivery.Status.PENDING);
+            deliveryRepository.save(delivery);
+        }
+
+        routeRepository.delete(route);
+    }
 }
