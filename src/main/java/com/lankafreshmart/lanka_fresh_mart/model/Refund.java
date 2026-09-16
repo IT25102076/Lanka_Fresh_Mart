@@ -27,7 +27,7 @@ public class Refund {
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(255)")
     private Status status;
 
     @Column(updatable = false)

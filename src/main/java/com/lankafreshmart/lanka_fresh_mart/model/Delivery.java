@@ -30,7 +30,7 @@ public class Delivery {
     private LocalDateTime scheduledDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(255)")
     private Status status;
 
     @ManyToOne(fetch = FetchType.LAZY)
