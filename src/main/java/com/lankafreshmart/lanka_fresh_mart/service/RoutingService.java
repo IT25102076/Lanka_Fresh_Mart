@@ -86,10 +86,10 @@ public class RoutingService {
         DeliveryRoute route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new RuntimeException("Route not found"));
 
-        // Unlink deliveries and set them back to pending
+        // Unlink deliveries and set them back to PREPARING
         for (Delivery delivery : route.getDeliveries()) {
             delivery.setDeliveryRoute(null);
-            delivery.setStatus(Delivery.Status.PENDING);
+            delivery.setStatus(Delivery.Status.PREPARING);
             deliveryRepository.save(delivery);
         }
 
