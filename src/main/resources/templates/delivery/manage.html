@@ -5,12 +5,17 @@
 </head>
 <body>
     <div>
-        <h2 class="mb-4">Delivery Management Dashboard</h2>
+        <h2 class="mb-4"><i class="bi bi-truck"></i> Delivery Management Dashboard</h2>
 
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-        <div class="card shadow-sm">
+        <!-- PREPARING Section -->
+        <div class="card shadow-sm mb-4 border-secondary">
+            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-box-seam"></i> Preparing</h5>
+                <span class="badge bg-light text-dark" th:text="${#lists.size(deliveries.?[status.name() == 'PREPARING'])}">0</span>
+            </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0 align-middle">
@@ -20,12 +25,12 @@
                                 <th>Customer</th>
                                 <th>Address</th>
                                 <th>Date</th>
-                                <th>Status</th>
+                                <th>Driver</th>
                                 <th>Update</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="delivery : ${deliveries}">
+                            <tr th:each="delivery : ${deliveries}" th:if="${delivery.status.name() == 'PREPARING'}">
                                 <td class="ps-3 fw-bold" th:text="'#' + ${delivery.order.id}">1</td>
                                 <td>
                                     <div th:text="${delivery.order.user.firstName + ' ' + delivery.order.user.lastName}">Name</div>
@@ -34,16 +39,15 @@
                                 <td><small th:text="${delivery.deliveryAddress}">Address</small></td>
                                 <td th:text="${#temporals.format(delivery.order.createdAt, 'dd-MM HH:mm')}">Date</td>
                                 <td>
-                                    <span class="badge" 
-                                          th:classappend="${delivery.status.name() == 'PREPARING'} ? 'bg-secondary' : (${delivery.status.name() == 'DISPATCHED'} ? 'bg-warning text-dark' : 'bg-success')"
-                                          th:text="${delivery.status}">STATUS</span>
+                                    <span th:if="${delivery.driver != null}" class="badge bg-info text-dark" th:text="${delivery.driver.name}"></span>
+                                    <span th:if="${delivery.driver == null}" class="text-muted small">Not assigned</span>
                                 </td>
                                 <td>
                                     <form th:action="@{/deliveries/update/{id}(id=${delivery.id})}" method="post" class="d-flex align-items-center">
                                         <select name="status" class="form-select form-select-sm me-2" style="width: auto;">
-                                            <option value="PREPARING" th:selected="${delivery.status.name() == 'PREPARING'}">PREPARING</option>
-                                            <option value="DISPATCHED" th:selected="${delivery.status.name() == 'DISPATCHED'}">DISPATCHED</option>
-                                            <option value="DELIVERED" th:selected="${delivery.status.name() == 'DELIVERED'}">DELIVERED</option>
+                                            <option value="PREPARING" selected>PREPARING</option>
+                                            <option value="DISPATCHED">DISPATCHED</option>
+                                            <option value="DELIVERED">DELIVERED</option>
                                         </select>
                                         <select name="driverId" class="form-select form-select-sm me-2" style="width: auto;">
                                             <option value="" disabled th:selected="${delivery.driver == null}">Assign Driver</option>
@@ -55,9 +59,114 @@
                             </tr>
                         </tbody>
                     </table>
+                    <div th:if="${#lists.size(deliveries.?[status.name() == 'PREPARING']) == 0}" class="text-center py-3 text-muted">
+                        No deliveries currently being prepared.
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- DISPATCHED Section -->
+        <div class="card shadow-sm mb-4 border-warning">
+            <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-send"></i> Dispatched</h5>
+                <span class="badge bg-dark" th:text="${#lists.size(deliveries.?[status.name() == 'DISPATCHED'])}">0</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3">Order ID</th>
+                                <th>Customer</th>
+                                <th>Address</th>
+                                <th>Date</th>
+                                <th>Driver</th>
+                                <th>Update</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="delivery : ${deliveries}" th:if="${delivery.status.name() == 'DISPATCHED'}">
+                                <td class="ps-3 fw-bold" th:text="'#' + ${delivery.order.id}">1</td>
+                                <td>
+                                    <div th:text="${delivery.order.user.firstName + ' ' + delivery.order.user.lastName}">Name</div>
+                                    <small class="text-muted" th:text="${delivery.order.user.phone}">Phone</small>
+                                </td>
+                                <td><small th:text="${delivery.deliveryAddress}">Address</small></td>
+                                <td th:text="${#temporals.format(delivery.order.createdAt, 'dd-MM HH:mm')}">Date</td>
+                                <td>
+                                    <span th:if="${delivery.driver != null}" class="badge bg-info text-dark" th:text="${delivery.driver.name}"></span>
+                                    <span th:if="${delivery.driver == null}" class="text-muted small">Not assigned</span>
+                                </td>
+                                <td>
+                                    <form th:action="@{/deliveries/update/{id}(id=${delivery.id})}" method="post" class="d-flex align-items-center">
+                                        <select name="status" class="form-select form-select-sm me-2" style="width: auto;">
+                                            <option value="PREPARING">PREPARING</option>
+                                            <option value="DISPATCHED" selected>DISPATCHED</option>
+                                            <option value="DELIVERED">DELIVERED</option>
+                                        </select>
+                                        <select name="driverId" class="form-select form-select-sm me-2" style="width: auto;">
+                                            <option value="" disabled th:selected="${delivery.driver == null}">Assign Driver</option>
+                                            <option th:each="d : ${drivers}" th:value="${d.id}" th:text="${d.name + ' (' + d.vehicleType + ')'}" th:selected="${delivery.driver != null and delivery.driver.id == d.id}"></option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-warning">Save</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div th:if="${#lists.size(deliveries.?[status.name() == 'DISPATCHED']) == 0}" class="text-center py-3 text-muted">
+                        No dispatched deliveries.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DELIVERED Section -->
+        <div class="card shadow-sm mb-4 border-success">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-check-circle"></i> Delivered</h5>
+                <span class="badge bg-light text-dark" th:text="${#lists.size(deliveries.?[status.name() == 'DELIVERED'])}">0</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3">Order ID</th>
+                                <th>Customer</th>
+                                <th>Address</th>
+                                <th>Date</th>
+                                <th>Driver</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="delivery : ${deliveries}" th:if="${delivery.status.name() == 'DELIVERED'}">
+                                <td class="ps-3 fw-bold" th:text="'#' + ${delivery.order.id}">1</td>
+                                <td>
+                                    <div th:text="${delivery.order.user.firstName + ' ' + delivery.order.user.lastName}">Name</div>
+                                    <small class="text-muted" th:text="${delivery.order.user.phone}">Phone</small>
+                                </td>
+                                <td><small th:text="${delivery.deliveryAddress}">Address</small></td>
+                                <td th:text="${#temporals.format(delivery.order.createdAt, 'dd-MM HH:mm')}">Date</td>
+                                <td>
+                                    <span th:if="${delivery.driver != null}" class="badge bg-info text-dark" th:text="${delivery.driver.name}"></span>
+                                    <span th:if="${delivery.driver == null}" class="text-muted small">—</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success">DELIVERED</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div th:if="${#lists.size(deliveries.?[status.name() == 'DELIVERED']) == 0}" class="text-center py-3 text-muted">
+                        No delivered orders yet.
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </body>
 </html>

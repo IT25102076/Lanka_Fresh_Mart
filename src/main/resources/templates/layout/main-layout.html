@@ -7,6 +7,7 @@
     <!-- Basic styling for now -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-success">
@@ -40,9 +41,7 @@
                     <li class="nav-item" sec:authorize="hasAuthority('CUSTOMER_RELATIONS_OFFICER') or hasAuthority('OPERATIONS_MANAGER')">
                         <a class="nav-link text-info fw-bold" th:href="@{/orders/manage}"><i class="bi bi-list-check"></i> Manage Orders</a>
                     </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('DELIVERY_COORDINATOR') or hasAuthority('OPERATIONS_MANAGER')">
-                        <a class="nav-link" th:href="@{/routing/dashboard}">Route Optimization</a>
-                    </li>
+
                     <li class="nav-item" sec:authorize="hasAuthority('FINANCE_EXECUTIVE') or hasAuthority('OPERATIONS_MANAGER')">
                         <a class="nav-link text-warning fw-bold" th:href="@{/finance/refunds}">
                             <i class="bi bi-cash-stack"></i> Process Refunds

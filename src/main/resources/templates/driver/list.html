@@ -38,10 +38,7 @@
                                     <span class="badge bg-info text-dark" th:text="${driver.vehicleType}">Van</span>
                                 </td>
                                 <td>
-                                    <div class="small">
-                                        Routes: <span class="badge bg-secondary rounded-pill" th:text="${driver.deliveryRoutes.size()}"></span><br>
-                                        Single Deliveries: <span class="badge bg-secondary rounded-pill" th:text="${driver.deliveries.size()}"></span>
-                                    </div>
+                                    <span class="badge bg-secondary rounded-pill" th:text="${driver.deliveries.size()}"></span> Deliveries
                                 </td>
                                 <td class="text-end pe-3">
                                     <div class="btn-group">
