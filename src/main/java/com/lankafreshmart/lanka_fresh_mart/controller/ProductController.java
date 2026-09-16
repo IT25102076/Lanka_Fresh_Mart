@@ -106,9 +106,9 @@ public class ProductController {
             productService.hardDeleteProduct(id);
             redirectAttributes.addFlashAttribute("success", "Product completely deleted from the database!");
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            redirectAttributes.addFlashAttribute("error", "Cannot delete product because it is linked to past orders. Please Discontinue it instead.");
+            redirectAttributes.addFlashAttribute("error", "Cannot delete product because it is linked to past orders or inventory alerts. Please Discontinue it instead.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error deleting product: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error removing product: " + e.getMessage());
         }
         return "redirect:/products/manage";
     }
