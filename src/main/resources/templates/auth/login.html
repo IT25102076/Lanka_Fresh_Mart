@@ -21,6 +21,7 @@
                         Registration successful! Please login.
                     </div>
                     <form th:action="@{/login}" method="post">
+
                         <div class="mb-3">
                             <label for="username" class="form-label">Email address</label>
                             <input type="email" class="form-control" id="username" name="username" required autofocus>
@@ -40,5 +41,20 @@
             </div>
         </div>
     </div>
+    <script>
+        function autofillLogin() {
+            var selector = document.getElementById("testAccountSelector");
+            var usernameInput = document.getElementById("username");
+            var passwordInput = document.getElementById("password");
+            
+            if (selector.value) {
+                usernameInput.value = selector.value;
+                passwordInput.value = "password123";
+            } else {
+                usernameInput.value = "";
+                passwordInput.value = "";
+            }
+        }
+    </script>
 </body>
 </html>

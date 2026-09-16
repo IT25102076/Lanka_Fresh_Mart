@@ -14,7 +14,7 @@
                 <h3 class="mb-0">Add New Product</h3>
             </div>
             <div class="card-body p-4">
-                <form th:action="@{/products/manage/add}" th:object="${product}" method="post">
+                <form th:action="@{/products/manage/add}" th:object="${product}" method="post" enctype="multipart/form-data">
                     
                     <!-- Basic Info -->
                     <h5 class="border-bottom pb-2 mb-3">Basic Information</h5>
@@ -38,9 +38,16 @@
                         <textarea class="form-control" id="description" th:field="*{description}" rows="3"></textarea>
                     </div>
                     
-                    <div class="mb-4">
-                        <label for="imageUrl" class="form-label">Image URL</label>
-                        <input type="url" class="form-control" id="imageUrl" th:field="*{imageUrl}" placeholder="https://example.com/image.jpg">
+                    <div class="mb-4 row">
+                        <div class="col-md-6">
+                            <label for="imageFile" class="form-label">Upload Image (from PC)</label>
+                            <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="imageUrl" class="form-label">Or Provide Image URL</label>
+                            <input type="text" class="form-control" id="imageUrl" th:field="*{imageUrl}" placeholder="https://example.com/image.jpg">
+                        </div>
+                        <div class="form-text mt-2 text-muted">If both are provided, the uploaded image from your PC will be used.</div>
                     </div>
 
                     <!-- Pricing & Inventory -->
@@ -52,7 +59,16 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="unit" class="form-label">Unit *</label>
-                            <input type="text" class="form-control" id="unit" th:field="*{unit}" placeholder="e.g. kg, piece, pack" required>
+                            <select class="form-select" id="unit" th:field="*{unit}" required>
+                                <option value="" disabled selected>Select Unit</option>
+                                <option value="kg">kg (Kilograms)</option>
+                                <option value="g">g (Grams)</option>
+                                <option value="L">L (Liters)</option>
+                                <option value="ml">ml (Milliliters)</option>
+                                <option value="pieces">pieces</option>
+                                <option value="packs">packs</option>
+                                <option value="bunches">bunches</option>
+                            </select>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="availability" class="form-label">Status *</label>

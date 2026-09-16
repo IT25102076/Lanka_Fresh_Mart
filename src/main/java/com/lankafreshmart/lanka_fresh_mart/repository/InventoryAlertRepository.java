@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface InventoryAlertRepository extends JpaRepository<InventoryAlert, Long> {
     Optional<InventoryAlert> findByProductAndIsResolvedFalse(Product product);
     List<InventoryAlert> findByIsResolvedFalseOrderByCreatedAtDesc();
+    void deleteByProduct(Product product);
 }
