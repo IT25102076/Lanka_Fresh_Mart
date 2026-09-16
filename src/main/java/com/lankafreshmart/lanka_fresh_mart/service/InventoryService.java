@@ -53,4 +53,22 @@ public class InventoryService {
         alert.setResolvedAt(LocalDateTime.now());
         alertRepository.save(alert);
     }
+
+    @Transactional
+    public void createManualAlert(Long productId, String message) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+                
+        InventoryAlert alert = new InventoryAlert();
+        alert.setProduct(product);
+        alert.setAlertMessage(message);
+        alertRepository.save(alert);
+    }
+
+    @Transactional
+    public void dismissAlert(Long alertId) {
+        InventoryAlert alert = alertRepository.findById(alertId)
+                .orElseThrow(() -> new RuntimeException("Alert not found"));
+        alertRepository.delete(alert);
+    }
 }

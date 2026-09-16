@@ -53,4 +53,15 @@ public class RoutingController {
         }
         return "redirect:/routing/dashboard?date=" + date;
     }
+
+    @PostMapping("/delete/{routeId}")
+    public String deleteRoute(@PathVariable Long routeId, @RequestParam String date, RedirectAttributes redirectAttributes) {
+        try {
+            routingService.deleteRoute(routeId);
+            redirectAttributes.addFlashAttribute("success", "Route successfully deleted. Its deliveries are back to pending status.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error deleting route: " + e.getMessage());
+        }
+        return "redirect:/routing/dashboard?date=" + date;
+    }
 }
