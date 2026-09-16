@@ -20,6 +20,7 @@ public class OrderDeliveryService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final InventoryService inventoryService;
+    private final com.lankafreshmart.lanka_fresh_mart.repository.DriverRepository driverRepository;
 
     @Transactional
     public Delivery createOrderFromCart(String username, String deliveryAddress) {
@@ -97,10 +98,17 @@ public class OrderDeliveryService {
     }
 
     @Transactional
-    public void updateDeliveryStatus(Long deliveryId, Delivery.Status newStatus) {
+    public void updateDeliveryStatus(Long deliveryId, Delivery.Status newStatus, Long driverId) {
         Delivery delivery = deliveryRepository.findById(deliveryId)
                 .orElseThrow(() -> new RuntimeException("Delivery not found"));
         delivery.setStatus(newStatus);
+        
+        if (driverId != null) {
+            com.lankafreshmart.lanka_fresh_mart.model.Driver driver = driverRepository.findById(driverId)
+                    .orElseThrow(() -> new RuntimeException("Driver not found"));
+            delivery.setDriver(driver);
+        }
+        
         deliveryRepository.save(delivery);
     }
 }

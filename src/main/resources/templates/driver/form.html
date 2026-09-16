@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<head>
+    <title>Driver Form - Lanka Fresh Mart</title>
+</head>
+<body>
+    <div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 th:text="${driver.id == null ? 'Add New Driver' : 'Edit Driver'}">Driver Form</h2>
+            <a th:href="@{/drivers}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to List</a>
+        </div>
+
+        <div class="card shadow-sm col-md-6">
+            <div class="card-body">
+                <form th:action="${driver.id == null ? '/drivers/create' : '/drivers/edit/' + driver.id}" method="post">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Driver Name *</label>
+                        <input type="text" name="name" class="form-control" th:value="${driver.name}" required placeholder="e.g. John Doe">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Contact Phone Number *</label>
+                        <input type="text" name="phone" class="form-control" th:value="${driver.phone}" required placeholder="e.g. 0771234567">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Vehicle Type</label>
+                        <select name="vehicleType" class="form-select">
+                            <option value="Bike" th:selected="${driver.vehicleType == 'Bike'}">Bike</option>
+                            <option value="Three-Wheeler" th:selected="${driver.vehicleType == 'Three-Wheeler'}">Three-Wheeler</option>
+                            <option value="Van" th:selected="${driver.vehicleType == 'Van'}">Van</option>
+                            <option value="Lorry" th:selected="${driver.vehicleType == 'Lorry'}">Lorry (Truck)</option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary" th:text="${driver.id == null ? 'Save Driver' : 'Update Driver'}">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

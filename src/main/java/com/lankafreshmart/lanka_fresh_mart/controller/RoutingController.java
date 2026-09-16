@@ -15,6 +15,7 @@ import java.time.LocalDate;
 public class RoutingController {
 
     private final RoutingService routingService;
+    private final com.lankafreshmart.lanka_fresh_mart.service.DriverService driverService;
 
     @GetMapping("/dashboard")
     public String viewDashboard(@RequestParam(required = false) String date, Model model) {
@@ -23,6 +24,7 @@ public class RoutingController {
         model.addAttribute("selectedDate", selectedDate);
         model.addAttribute("routes", routingService.getRoutesForDate(selectedDate));
         model.addAttribute("pendingDeliveries", routingService.getPendingDeliveriesForDate(selectedDate));
+        model.addAttribute("drivers", driverService.getAllDrivers());
         
         return "delivery/routing-dashboard";
     }
@@ -40,14 +42,14 @@ public class RoutingController {
     }
 
     @PostMapping("/assign-driver/{routeId}")
-    public String assignDriver(@PathVariable Long routeId, @RequestParam String driverName, @RequestParam String date, RedirectAttributes redirectAttributes) {
-        if (driverName == null || driverName.trim().isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Driver name cannot be empty.");
+    public String assignDriver(@PathVariable Long routeId, @RequestParam(required = false) Long driverId, @RequestParam String date, RedirectAttributes redirectAttributes) {
+        if (driverId == null) {
+            redirectAttributes.addFlashAttribute("error", "Please select a driver.");
             return "redirect:/routing/dashboard?date=" + date;
         }
 
         try {
-            routingService.assignDriver(routeId, driverName);
+            routingService.assignDriver(routeId, driverId);
             redirectAttributes.addFlashAttribute("success", "Driver successfully assigned to route!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

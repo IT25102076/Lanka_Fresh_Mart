@@ -16,8 +16,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoutingService {
 
-    private final DeliveryRepository deliveryRepository;
     private final DeliveryRouteRepository routeRepository;
+    private final DeliveryRepository deliveryRepository;
+    private final com.lankafreshmart.lanka_fresh_mart.repository.DriverRepository driverRepository;
 
     private static final int MAX_DELIVERIES_PER_ROUTE = 5;
 
@@ -78,10 +79,18 @@ public class RoutingService {
     }
     
     @Transactional
-    public void assignDriver(Long routeId, String driverName) {
+    public void assignDriver(Long routeId, Long driverId) {
         DeliveryRoute route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new RuntimeException("Route not found"));
-        route.setDriverName(driverName);
+        
+        // Find driver
+        com.lankafreshmart.lanka_fresh_mart.model.Driver driver = null;
+        if (driverId != null) {
+            driver = driverRepository.findById(driverId)
+                    .orElseThrow(() -> new RuntimeException("Driver not found"));
+        }
+
+        route.setDriver(driver);
         route.setStatus(DeliveryRoute.Status.IN_PROGRESS);
         routeRepository.save(route);
     }

@@ -25,7 +25,9 @@ public class DeliveryRoute {
     @Column(nullable = false)
     private String routeName;
 
-    private String driverName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "driver_id")
+    private Driver driver;
 
     @Column(nullable = false)
     private LocalDate scheduledDate;

@@ -12,6 +12,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.lankafreshmart.lanka_fresh_mart.service.CartService;
 import com.lankafreshmart.lanka_fresh_mart.service.StripeService;
 
+import com.lankafreshmart.lanka_fresh_mart.service.DriverService;
+
 @Controller
 @RequiredArgsConstructor
 public class DeliveryController {
@@ -19,6 +21,7 @@ public class DeliveryController {
     private final OrderDeliveryService deliveryService;
     private final CartService cartService;
     private final StripeService stripeService;
+    private final DriverService driverService;
 
     @GetMapping("/checkout")
     public String viewCheckoutPage(Authentication authentication, RedirectAttributes redirectAttributes) {
@@ -83,14 +86,16 @@ public class DeliveryController {
     @GetMapping("/deliveries/manage")
     public String manageDeliveries(Model model) {
         model.addAttribute("deliveries", deliveryService.getAllDeliveries());
+        model.addAttribute("drivers", driverService.getAllDrivers());
         return "delivery/manage";
     }
 
     @PostMapping("/deliveries/update/{id}")
     public String updateDeliveryStatus(@PathVariable Long id, @RequestParam Delivery.Status status, 
+                                       @RequestParam(required = false) Long driverId,
                                        RedirectAttributes redirectAttributes) {
         try {
-            deliveryService.updateDeliveryStatus(id, status);
+            deliveryService.updateDeliveryStatus(id, status, driverId);
             redirectAttributes.addFlashAttribute("success", "Delivery status updated!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
