@@ -1,60 +1,402 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::main})}">
 <head>
     <title>Login - Lanka Fresh Mart</title>
 </head>
 <body>
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card mt-5 shadow-sm">
-                <div class="card-header bg-white text-center">
-                    <h4>Login to Lanka Fresh Mart</h4>
-                </div>
-                <div class="card-body p-4">
-                    <div th:if="${param.error}" class="alert alert-danger">
-                        Invalid username or password.
-                    </div>
-                    <div th:if="${param.logout}" class="alert alert-info">
-                        You have been logged out.
-                    </div>
-                    <div th:if="${param.success}" class="alert alert-success">
-                        Registration successful! Please login.
-                    </div>
-                    <form th:action="@{/login}" method="post">
+    <main class="login-page">
+        <!-- The class "is-register-mode" controls the CSS animations -->
+        <div class="login-hero-layout" id="authLayout">
+            <!-- Left Side - Hero Image -->
+            <div class="login-hero-image">
+                <img th:src="@{/images/delivery-hero.png}" alt="Delivery Person with Groceries">
+            </div>
 
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Email address</label>
-                            <input type="email" class="form-control" id="username" name="username" required autofocus>
+            <!-- Right Side - Forms Container -->
+            <div class="login-hero-form">
+                <div class="login-card-floating">
+                    
+                    <!-- ================= LOGIN SECTION ================= -->
+                    <div id="loginSection" class="auth-section">
+                        <h3>Welcome Back</h3>
+                        <p class="text-muted mb-4">Sign in to your account to continue shopping</p>
+
+                        <!-- Alerts -->
+                        <div th:if="${param.error}" class="alert alert-danger d-flex align-items-center rounded-3 py-2 px-3 mb-3" style="font-size: 0.85rem;">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> Invalid email or password.
                         </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                        <div th:if="${param.logout}" class="alert alert-info d-flex align-items-center rounded-3 py-2 px-3 mb-3" style="font-size: 0.85rem;">
+                            <i class="bi bi-check-circle-fill me-2"></i> You have been logged out successfully.
                         </div>
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-success">Login</button>
+                        <div th:if="${param.success}" class="alert alert-success d-flex align-items-center rounded-3 py-2 px-3 mb-3" style="font-size: 0.85rem;">
+                            <i class="bi bi-check-circle-fill me-2"></i> Registration successful! Please sign in.
                         </div>
-                    </form>
-                    <div class="text-center mt-3">
-                        <a th:href="@{/register}">Don't have an account? Register here.</a>
+                        <div th:if="${param.resetSuccess}" class="alert alert-success d-flex align-items-center rounded-3 py-2 px-3 mb-3" style="font-size: 0.85rem;">
+                            <i class="bi bi-check-circle-fill me-2"></i> Password has been reset successfully! Please log in.
+                        </div>
+
+                        <form th:action="@{/login}" method="post">
+                            <div class="mb-3">
+                                <label for="username" class="form-label fw-medium" style="font-size: 0.85rem;">Email Address</label>
+                                <div class="login-input-group">
+                                    <i class="bi bi-envelope"></i>
+                                    <input type="email" class="form-control" id="username" name="username" placeholder="name@example.com" required autofocus>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label for="password" class="form-label fw-medium mb-0" style="font-size: 0.85rem;">Password</label>
+                                    <a href="javascript:void(0)" onclick="toggleAuthMode('reset')" class="text-decoration-none small" style="color: var(--clr-primary); font-size: 0.8rem;">Forgot password?</a>
+                                </div>
+                                <div class="login-input-group mt-1">
+                                    <i class="bi bi-lock"></i>
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn login-btn-primary w-100 mb-3">
+                                Sign In <i class="bi bi-arrow-right ms-2"></i>
+                            </button>
+                        </form>
+
+                        <div class="login-divider">
+                            <span>New to Lanka Fresh Mart?</span>
+                        </div>
+
+                        <button type="button" class="btn login-btn-outline w-100" onclick="toggleAuthMode('register')">
+                            <i class="bi bi-person-plus me-2"></i> Create an Account
+                        </button>
                     </div>
+
+                    <!-- ================= REGISTER SECTION ================= -->
+                    <div id="registerSection" class="auth-section hide-section">
+                        <h3>Create Account</h3>
+                        <p class="text-muted mb-3" style="font-size: 0.85rem;">Fill in your details to get started</p>
+
+                        <!-- Error Alert -->
+                        <div th:if="${error}" class="alert alert-danger d-flex align-items-center rounded-3 py-2 px-3 mb-3" style="font-size: 0.85rem;">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${error}"></span>
+                        </div>
+
+                        <form th:action="@{/register}" th:object="${user}" method="post">
+                            <!-- Name Row -->
+                            <div class="row g-2 mb-2">
+                                <div class="col-6">
+                                    <label for="firstName" class="form-label fw-medium" style="font-size: 0.85rem;">First Name</label>
+                                    <div class="login-input-group">
+                                        <i class="bi bi-person"></i>
+                                        <input type="text" class="form-control" id="firstName" th:field="*{firstName}" placeholder="e.g. Nimal">
+                                    </div>
+                                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="lastName" class="form-label fw-medium" style="font-size: 0.85rem;">Last Name</label>
+                                    <div class="login-input-group">
+                                        <i class="bi bi-person"></i>
+                                        <input type="text" class="form-control" id="lastName" th:field="*{lastName}" placeholder="e.g. Perera">
+                                    </div>
+                                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+                                </div>
+                            </div>
+
+                            <!-- Email Row -->
+                            <div class="row g-2 mb-2">
+                                <div class="col-6">
+                                    <label for="regEmail" class="form-label fw-medium" style="font-size: 0.85rem;">Email Address</label>
+                                    <div class="login-input-group">
+                                        <i class="bi bi-envelope"></i>
+                                        <input type="email" class="form-control" id="regEmail" th:field="*{email}" placeholder="name@example.com">
+                                    </div>
+                                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="phone" class="form-label fw-medium" style="font-size: 0.85rem;">Phone Number <span class="text-muted fw-normal">(Optional)</span></label>
+                                    <div class="login-input-group">
+                                        <i class="bi bi-telephone"></i>
+                                        <input type="text" class="form-control" id="phone" th:field="*{phone}" placeholder="+94 XX XXX XXXX" oninput="formatSriLankanPhone(this)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Address -->
+                            <div class="mb-2">
+                                <label for="address" class="form-label fw-medium" style="font-size: 0.85rem;">Delivery Address <span class="text-muted fw-normal">(Optional)</span></label>
+                                <div class="login-input-group">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <textarea class="form-control" id="address" th:field="*{address}" rows="1" placeholder="Street address, city..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Password -->
+                            <div class="mb-2">
+                                <label for="regPassword" class="form-label fw-medium" style="font-size: 0.85rem;">Password</label>
+                                <div class="login-input-group">
+                                    <i class="bi bi-lock"></i>
+                                    <input type="password" class="form-control" id="regPassword" th:field="*{password}" placeholder="Create a strong password" oninput="checkPasswordStrength(this.value, 'reg-')">
+                                </div>
+                                <div th:if="${#fields.hasErrors('password')}" class="text-danger small mt-1" th:errors="*{password}"></div>
+
+                                <!-- Strength Bar -->
+                                <div class="pw-strength-bar mt-2">
+                                    <div class="pw-strength-track">
+                                        <div id="reg-pw-fill" class="pw-strength-fill"></div>
+                                    </div>
+                                    <span id="reg-pw-label" class="pw-strength-label">Enter a password</span>
+                                </div>
+
+                                <!-- Requirements checklist -->
+                                <ul class="pw-requirements mt-1">
+                                    <li id="reg-req-len"><i class="bi bi-circle req-icon"></i> At least 8 characters</li>
+                                    <li id="reg-req-upper"><i class="bi bi-circle req-icon"></i> At least 1 uppercase letter</li>
+                                    <li id="reg-req-num"><i class="bi bi-circle req-icon"></i> At least 1 number</li>
+                                </ul>
+                            </div>
+
+                            <input type="hidden" th:field="*{role}">
+
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <button type="submit" class="btn login-btn-primary w-100 h-100">
+                                        Create Account <i class="bi bi-arrow-right ms-1"></i>
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" class="btn login-btn-outline w-100 h-100" onclick="toggleAuthMode('login')">
+                                        <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- ================= RESET PASSWORD SECTION ================= -->
+                    <div id="resetSection" class="auth-section hide-section">
+                        <h3>Reset Password</h3>
+                        <p class="text-muted mb-4" th:if="${param.otpSent == null}">Enter your email to receive a 6-digit OTP</p>
+                        <p class="text-muted mb-4" th:if="${param.otpSent != null}">Check your email (or console) for the OTP</p>
+
+                        <!-- Error Alert -->
+                        <div th:if="${param.resetError}" class="alert alert-danger d-flex align-items-center rounded-3 py-2 px-3 mb-3" style="font-size: 0.85rem;">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${param.resetError}"></span>
+                        </div>
+
+                        <!-- Step 1: Request OTP -->
+                        <form th:if="${param.otpSent == null}" th:action="@{/request-reset-otp}" method="post" onsubmit="
+                            const btn = this.querySelector('button[type=submit]');
+                            btn.disabled = true;
+                            btn.innerHTML = 'Sending... <i class=\'spinner-border spinner-border-sm ms-1\'></i>';
+                        ">
+                            <div class="mb-4">
+                                <label for="resetEmailReq" class="form-label fw-medium" style="font-size: 0.85rem;">Email Address</label>
+                                <div class="login-input-group">
+                                    <i class="bi bi-envelope"></i>
+                                    <input type="email" class="form-control" id="resetEmailReq" name="resetEmail" placeholder="name@example.com" required>
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <button type="submit" class="btn login-btn-primary w-100 h-100">
+                                        Send OTP <i class="bi bi-send ms-1"></i>
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" class="btn login-btn-outline w-100 h-100" onclick="toggleAuthMode('login')">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Step 2: Verify OTP and set New Password -->
+                        <form th:if="${param.otpSent != null}" th:action="@{/reset-password}" method="post" onsubmit="
+                            const btn = this.querySelector('button[type=submit]');
+                            btn.disabled = true;
+                            btn.innerHTML = 'Resetting... <i class=\'spinner-border spinner-border-sm ms-1\'></i>';
+                        ">
+                            <input type="hidden" name="resetEmail" th:value="${param.otpSent}">
+                            
+                            <div class="mb-3">
+                                <label for="otpCode" class="form-label fw-medium" style="font-size: 0.85rem;">6-Digit OTP</label>
+                                <div class="login-input-group">
+                                    <i class="bi bi-shield-lock"></i>
+                                    <input type="text" class="form-control" id="otpCode" name="otpCode" placeholder="Enter OTP" required autofocus>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="newPassword" class="form-label fw-medium" style="font-size: 0.85rem;">New Password</label>
+                                <div class="login-input-group">
+                                    <i class="bi bi-lock"></i>
+                                    <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="Create new password" required oninput="checkPasswordStrength(this.value, 'reset-')">
+                                </div>
+                                <!-- Strength Bar -->
+                                <div class="pw-strength-bar mt-2">
+                                    <div class="pw-strength-track">
+                                        <div id="reset-pw-fill" class="pw-strength-fill"></div>
+                                    </div>
+                                    <span id="reset-pw-label" class="pw-strength-label">Enter a password</span>
+                                </div>
+
+                                <!-- Requirements checklist -->
+                                <ul class="pw-requirements mt-1">
+                                    <li id="reset-req-len"><i class="bi bi-circle req-icon"></i> At least 8 characters</li>
+                                    <li id="reset-req-upper"><i class="bi bi-circle req-icon"></i> At least 1 uppercase letter</li>
+                                    <li id="reset-req-num"><i class="bi bi-circle req-icon"></i> At least 1 number</li>
+                                </ul>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <button type="submit" class="btn login-btn-primary w-100 h-100" id="resetSubmitBtn" disabled>
+                                        Reset <i class="bi bi-check2 ms-1"></i>
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" class="btn login-btn-outline w-100 h-100" onclick="toggleAuthMode('login')">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
                 </div>
             </div>
         </div>
-    </div>
-    <script>
-        function autofillLogin() {
-            var selector = document.getElementById("testAccountSelector");
-            var usernameInput = document.getElementById("username");
-            var passwordInput = document.getElementById("password");
-            
-            if (selector.value) {
-                usernameInput.value = selector.value;
-                passwordInput.value = "password123";
-            } else {
-                usernameInput.value = "";
-                passwordInput.value = "";
+
+        <!-- Logic to toggle between forms smoothly -->
+        <script>
+            function toggleAuthMode(mode) {
+                const layout = document.getElementById('authLayout');
+                const loginSec = document.getElementById('loginSection');
+                const registerSec = document.getElementById('registerSection');
+                const resetSec = document.getElementById('resetSection');
+
+                // Hide all sections first
+                loginSec.classList.add('hide-section');
+                registerSec.classList.add('hide-section');
+                resetSec.classList.add('hide-section');
+                layout.classList.remove('is-register-mode', 'is-reset-mode');
+
+                if (mode === 'register') {
+                    layout.classList.add('is-register-mode');
+                    registerSec.classList.remove('hide-section');
+                    history.pushState(null, '', '/register');
+                } else if (mode === 'reset') {
+                    layout.classList.add('is-reset-mode');
+                    resetSec.classList.remove('hide-section');
+                    history.pushState(null, '', '/login?reset');
+                } else {
+                    loginSec.classList.remove('hide-section');
+                    history.pushState(null, '', '/login');
+                }
             }
-        }
-    </script>
+
+            // On page load, check if we need to be in a specific mode
+            document.addEventListener('DOMContentLoaded', () => {
+                const path = window.location.pathname;
+                const searchParams = new URLSearchParams(window.location.search);
+                const hasErrors = document.querySelector('#registerSection .text-danger') !== null;
+                const hasErrorAlert = document.querySelector('#registerSection .alert-danger') !== null;
+                
+                if (path.includes('register') || hasErrors || hasErrorAlert) {
+                    toggleAuthMode('register');
+                } else if (searchParams.has('resetError') || searchParams.has('reset') || searchParams.has('otpSent')) {
+                    toggleAuthMode('reset');
+                } else {
+                    toggleAuthMode('login');
+                }
+            });
+
+            /* ── Password Strength Checker ── */
+            function checkPasswordStrength(val, prefix) {
+                const hasLen   = val.length >= 8;
+                const hasUpper = /[A-Z]/.test(val);
+                const hasNum   = /[0-9]/.test(val);
+
+                // Update requirement items
+                setReq(prefix + 'req-len',   hasLen);
+                setReq(prefix + 'req-upper', hasUpper);
+                setReq(prefix + 'req-num',   hasNum);
+
+                // Score: 0–3
+                const score = [hasLen, hasUpper, hasNum].filter(Boolean).length;
+
+                const fill  = document.getElementById(prefix + 'pw-fill');
+                const label = document.getElementById(prefix + 'pw-label');
+
+                const states = [
+                    { w: '0%',    bg: '#e9ecef', text: 'Enter a password',   cls: '' },
+                    { w: '33%',   bg: '#dc3545', text: 'Weak',               cls: 'pw-weak' },
+                    { w: '66%',   bg: '#f59e0b', text: 'Almost there…',      cls: 'pw-medium' },
+                    { w: '100%',  bg: '#10b981', text: '✓ Strong password',  cls: 'pw-strong' },
+                ];
+
+                const s = val.length === 0 ? states[0] : states[score];
+                fill.style.width      = s.w;
+                fill.style.background = s.bg;
+                label.textContent     = s.text;
+                label.className       = 'pw-strength-label ' + s.cls;
+
+                // Block submit until all 3 pass
+                let submitBtn;
+                if (prefix === 'reg-') {
+                    submitBtn = document.querySelector('#registerSection button[type="submit"]');
+                } else if (prefix === 'reset-') {
+                    submitBtn = document.getElementById('resetSubmitBtn');
+                }
+                
+                if (submitBtn) submitBtn.disabled = score < 3;
+            }
+
+            function setReq(id, met) {
+                const el   = document.getElementById(id);
+                const icon = el.querySelector('.req-icon');
+                if (met) {
+                    el.classList.add('req-met');
+                    icon.className = 'bi bi-check-circle-fill req-icon';
+                } else {
+                    el.classList.remove('req-met');
+                    icon.className = 'bi bi-circle req-icon';
+                }
+            }
+
+            /* ── Phone Number Formatter ── */
+            function formatSriLankanPhone(input) {
+                let val = input.value;
+                
+                // Allow user to clear the field easily
+                if (val.length < 3) {
+                    return; 
+                }
+                
+                let digitsOnly = val.replace(/\D/g, '');
+                
+                if (digitsOnly.length === 0) return;
+
+                // Normalize prefix
+                if (digitsOnly.startsWith('0')) {
+                    digitsOnly = '94' + digitsOnly.substring(1);
+                } else if (digitsOnly.startsWith('940')) {
+                    digitsOnly = '94' + digitsOnly.substring(3);
+                } else if (!digitsOnly.startsWith('94') && digitsOnly.length > 0) {
+                    digitsOnly = '94' + digitsOnly;
+                }
+
+                // Extract subscriber number (up to 9 digits after 94)
+                let subNum = digitsOnly.substring(2, 11);
+
+                if (subNum.length === 0) {
+                    input.value = '+94';
+                    return;
+                }
+
+                // Format as +94 XX XXX XXXX
+                let formatted = '+94';
+                if (subNum.length > 0) formatted += ' ' + subNum.substring(0, 2);
+                if (subNum.length > 2) formatted += ' ' + subNum.substring(2, 5);
+                if (subNum.length > 5) formatted += ' ' + subNum.substring(5, 9);
+
+                input.value = formatted;
+            }
+        </script>
+    </main>
 </body>
 </html>

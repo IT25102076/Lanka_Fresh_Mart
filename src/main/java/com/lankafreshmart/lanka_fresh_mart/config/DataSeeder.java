@@ -20,7 +20,7 @@ public class DataSeeder implements CommandLineRunner {
             System.out.println("==================================================");
             System.out.println("SEEDING DEFAULT TEST ACCOUNTS...");
             
-            String password = passwordEncoder.encode("password123");
+            String password = passwordEncoder.encode("Password123");
 
             createUserIfNotFound("Test", "Customer", "customer@test.com", password, User.Role.CUSTOMER);
             createUserIfNotFound("Test", "Supervisor", "supervisor@test.com", password, User.Role.STORE_SUPERVISOR);
@@ -30,7 +30,7 @@ public class DataSeeder implements CommandLineRunner {
             createUserIfNotFound("Test", "Operations", "operations@test.com", password, User.Role.OPERATIONS_MANAGER);
             
             System.out.println("All test accounts created successfully!");
-            System.out.println("Password for all accounts is: password123");
+            System.out.println("Password for all accounts is: Password123");
             System.out.println("==================================================");
         }
     }

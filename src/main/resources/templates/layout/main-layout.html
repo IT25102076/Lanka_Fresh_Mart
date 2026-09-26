@@ -1,124 +1,372 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="html(content)">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lanka Fresh Mart</title>
-    <!-- Basic styling for now -->
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>FreshMart Grocery & Fresh Delivery</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- CSRF Meta Tags -->
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}" />
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
-        <div class="container">
-            <a class="navbar-brand" th:href="@{/home}">Lanka Fresh Mart</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-space navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/products}">Products</a>
-                    </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('CUSTOMER')">
-                        <a class="nav-link" th:href="@{/cart}">
-                            <i class="bi bi-cart"></i> Cart
-                        </a>
-                    </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('CUSTOMER')">
-                        <a class="nav-link" th:href="@{/orders/my-orders}">My Orders</a>
-                    </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('CUSTOMER')">
-                        <a class="nav-link" th:href="@{/deliveries/track}">Track Delivery</a>
-                    </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('CUSTOMER')">
-                        <a class="nav-link" th:href="@{/support/my-tickets}"><i class="bi bi-headset"></i> Support</a>
-                    </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('CUSTOMER_RELATIONS_OFFICER') or hasAuthority('OPERATIONS_MANAGER')">
-                        <a class="nav-link text-info fw-bold" th:href="@{/orders/manage}"><i class="bi bi-list-check"></i> Manage Orders</a>
-                    </li>
 
-                    <li class="nav-item" sec:authorize="hasAuthority('FINANCE_EXECUTIVE') or hasAuthority('OPERATIONS_MANAGER')">
-                        <a class="nav-link text-warning fw-bold" th:href="@{/finance/refunds}">
-                            <i class="bi bi-cash-stack"></i> Process Refunds
-                        </a>
-                    </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('FINANCE_EXECUTIVE') or hasAuthority('OPERATIONS_MANAGER')">
-                        <a class="nav-link text-success fw-bold" th:href="@{/finance/dashboard}">
-                            <i class="bi bi-graph-up-arrow"></i> Finance Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('CUSTOMER_RELATIONS_OFFICER') or hasAuthority('OPERATIONS_MANAGER')">
-                        <a class="nav-link" th:href="@{/support/manage}"><i class="bi bi-kanban"></i> Manage Support</a>
-                    </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('OPERATIONS_MANAGER')">
-                        <a class="nav-link text-primary fw-bold" th:href="@{/executive-dashboard}">
-                            <i class="bi bi-speedometer2"></i> Executive Dashboard
-                        </a>
-                    </li>
+    <!-- Header / Navbar -->
+    <header class="lfm-header">
+        <!-- Top Row -->
+        <div class="nav-top-row">
+            <!-- Logo (Left) -->
+            <a th:href="@{/}" class="brand-text">
+                <i class="bi bi-basket-fill me-2" style="color: var(--clr-primary);"></i>
+                <span class="fresh">Fresh</span><span class="mart">Mart</span>
+            </a>
 
-                    <li class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('STORE_SUPERVISOR')">
-                        <a class="nav-link" th:href="@{/products/manage}">Manage Products</a>
-                    </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('DELIVERY_COORDINATOR') or hasAuthority('OPERATIONS_MANAGER')">
-                        <a class="nav-link" th:href="@{/deliveries/manage}">Manage Deliveries</a>
-                    </li>
-                    <li class="nav-item" sec:authorize="hasAuthority('DELIVERY_COORDINATOR') or hasAuthority('OPERATIONS_MANAGER')">
-                        <a class="nav-link" th:href="@{/drivers}">Manage Drivers</a>
-                    </li>
+            <!-- Search Bar (Centered to Full Page) -->
+            <div class="nav-search-center">
+                <form class="search-bar" th:action="@{/products}" method="GET" autocomplete="off">
+                    <i class="bi bi-search text-muted"></i>
+                    <input type="text" id="searchInput" name="query" placeholder="Search Grocery Items..." th:value="${searchQuery}">
+                    <button type="submit" style="display: none;"></button>
+                </form>
+                <!-- Autocomplete Dropdown -->
+                <div id="searchSuggestions" class="search-suggestions"></div>
+            </div>
 
-                    <li class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('STORE_SUPERVISOR')">
-                        <a class="nav-link text-danger" th:href="@{/inventory/alerts}">
-                            <i class="bi bi-exclamation-triangle"></i> Inventory Alerts
-                        </a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item" sec:authorize="!isAuthenticated()">
-                        <a class="nav-link" th:href="@{/login}">Login</a>
-                    </li>
-                    <li class="nav-item" sec:authorize="!isAuthenticated()">
-                        <a class="nav-link" th:href="@{/register}">Register</a>
-                    </li>
-                    <li class="nav-item">
-                        <form th:action="@{/fast-switch}" method="post" class="d-inline d-flex align-items-center ms-2" style="margin-top: 6px;">
-                            <select name="email" class="form-select form-select-sm bg-warning text-dark border-0 fw-bold" onchange="if(this.value) this.form.submit();">
-                                <option value="">⚡ Fast Switch</option>
-                                <option value="customer@test.com">Customer</option>
-                                <option value="supervisor@test.com">Store Supervisor</option>
-                                <option value="delivery@test.com">Delivery</option>
-                                <option value="finance@test.com">Finance</option>
-                                <option value="support@test.com">Support</option>
-                                <option value="operations@test.com">Operations</option>
-                            </select>
-                        </form>
-                    </li>
-                    <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <span class="nav-link text-light" sec:authentication="name">User</span>
-                    </li>
-                    <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <form th:action="@{/logout}" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-link nav-link">Logout</button>
-                        </form>
-                    </li>
-                </ul>
+            <!-- Right Actions -->
+            <div class="nav-actions">
+                <!-- Cart (Only for Customers) -->
+                <a th:href="@{/cart}" class="nav-pill text-decoration-none" th:if="${#authorization.expression('hasAuthority(''CUSTOMER'')')}">
+                    <i class="bi bi-bag"></i> CART <span class="cart-badge" th:text="${cartItemCount != null ? cartItemCount : 0}">0</span>
+                </a>
+
+                <!-- Staff Portal (Only for Employees) -->
+                <div class="dropdown" th:if="${#authorization.expression('hasAnyAuthority(''STORE_SUPERVISOR'', ''DELIVERY_COORDINATOR'', ''FINANCE_EXECUTIVE'', ''CUSTOMER_RELATIONS_OFFICER'', ''OPERATIONS_MANAGER'')')}">
+                    <button class="nav-pill border-0 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-shield-check"></i> Staff Portal
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 staff-portal-menu" style="border-radius: var(--radius-md); min-width: 240px;">
+
+                        <!-- OPERATIONS_MANAGER only -->
+                        <li th:if="${#authorization.expression('hasAuthority(''OPERATIONS_MANAGER'')')}">
+                            <a th:href="@{/executive-dashboard}" class="dropdown-item py-2"><i class="bi bi-speedometer2 me-2" style="color: #6366f1;"></i>Executive Dashboard</a>
+                        </li>
+                        <li th:if="${#authorization.expression('hasAuthority(''OPERATIONS_MANAGER'')')}"><hr class="dropdown-divider"></li>
+
+                        <!-- STORE_SUPERVISOR + OPERATIONS_MANAGER -->
+                        <li th:if="${#authorization.expression('hasAnyAuthority(''STORE_SUPERVISOR'', ''OPERATIONS_MANAGER'')')}">
+                            <a th:href="@{/products/manage}" class="dropdown-item py-2"><i class="bi bi-box-seam me-2 text-success"></i>Manage Products</a>
+                        </li>
+                        <li th:if="${#authorization.expression('hasAnyAuthority(''STORE_SUPERVISOR'', ''OPERATIONS_MANAGER'')')}">
+                            <a th:href="@{/inventory/alerts}" class="dropdown-item py-2"><i class="bi bi-exclamation-triangle me-2 text-warning"></i>Inventory Alerts</a>
+                        </li>
+
+                        <!-- DELIVERY_COORDINATOR + OPERATIONS_MANAGER -->
+                        <li th:if="${#authorization.expression('hasAnyAuthority(''DELIVERY_COORDINATOR'', ''OPERATIONS_MANAGER'')')}">
+                            <a th:href="@{/deliveries/manage}" class="dropdown-item py-2"><i class="bi bi-truck me-2 text-info"></i>Manage Deliveries</a>
+                        </li>
+                        <li th:if="${#authorization.expression('hasAnyAuthority(''DELIVERY_COORDINATOR'', ''OPERATIONS_MANAGER'')')}">
+                            <a th:href="@{/drivers}" class="dropdown-item py-2"><i class="bi bi-person-badge me-2" style="color: #0891b2;"></i>Manage Drivers</a>
+                        </li>
+
+                        <!-- CUSTOMER_RELATIONS_OFFICER + OPERATIONS_MANAGER -->
+                        <li th:if="${#authorization.expression('hasAnyAuthority(''CUSTOMER_RELATIONS_OFFICER'', ''OPERATIONS_MANAGER'')')}">
+                            <a th:href="@{/orders/manage}" class="dropdown-item py-2"><i class="bi bi-receipt me-2 text-primary"></i>Manage Orders</a>
+                        </li>
+                        <li th:if="${#authorization.expression('hasAnyAuthority(''CUSTOMER_RELATIONS_OFFICER'', ''OPERATIONS_MANAGER'')')}">
+                            <a th:href="@{/support/manage}" class="dropdown-item py-2"><i class="bi bi-headset me-2 text-danger"></i>Customer Support</a>
+                        </li>
+
+                        <!-- FINANCE_EXECUTIVE + OPERATIONS_MANAGER -->
+                        <li th:if="${#authorization.expression('hasAnyAuthority(''FINANCE_EXECUTIVE'', ''OPERATIONS_MANAGER'')')}">
+                            <a th:href="@{/finance/dashboard}" class="dropdown-item py-2"><i class="bi bi-bar-chart-line me-2" style="color: #059669;"></i>Finance Dashboard</a>
+                        </li>
+                        <li th:if="${#authorization.expression('hasAnyAuthority(''FINANCE_EXECUTIVE'', ''OPERATIONS_MANAGER'')')}">
+                            <a th:href="@{/finance/refunds}" class="dropdown-item py-2"><i class="bi bi-cash-coin me-2 text-warning"></i>Manage Refunds</a>
+                        </li>
+                    </ul>
+                </div>
+                <a th:href="@{/login}" class="nav-pill text-decoration-none" th:if="${not #authorization.expression('isAuthenticated()')}">
+                    <i class="bi bi-person"></i> Login/Signup
+                </a>
+
+
+                <!-- My Account Dropdown -->
+                <div class="dropdown" th:if="${#authorization.expression('isAuthenticated()')}">
+                    <button class="nav-pill border-0 dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle"></i> <span th:text="${#authentication.principal.firstName}">Account</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="accountDropdown" style="border-radius: var(--radius-md); min-width: 220px;">
+                        <li class="px-3 pt-3 pb-2" th:if="${#authorization.expression('hasAuthority(''CUSTOMER'')')}">
+                            <p class="text-muted small mb-0 fw-medium" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">My Account</p>
+                        </li>
+                        <li th:if="${#authorization.expression('hasAuthority(''CUSTOMER'')')}">
+                            <a th:href="@{/orders/my-orders}" class="dropdown-item py-2">
+                                <i class="bi bi-receipt me-2" style="color: var(--clr-primary);"></i> My Orders
+                            </a>
+                        </li>
+                        <li th:if="${#authorization.expression('hasAuthority(''CUSTOMER'')')}">
+                            <a th:href="@{/support/my-tickets}" class="dropdown-item py-2">
+                                <i class="bi bi-headset me-2 text-danger"></i> My Support Tickets
+                            </a>
+                        </li>
+                        <li th:if="${#authorization.expression('hasAuthority(''CUSTOMER'')')}"><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="dropdown-item py-2 text-danger">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+
+
+                <!-- Role Switcher Simulation (For Dev Purposes) -->
+                <div class="dropdown" th:if="${#authorization.expression('isAuthenticated()')}">
+                    <button class="nav-pill border-0 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-gear"></i> Role
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: var(--radius-md);">
+                        <li>
+                            <form th:action="@{/fast-switch}" method="post">
+                                <input type="hidden" name="email" value="customer@test.com">
+                                <input type="hidden" name="redirectUrl" value="/home">
+                                <button type="submit" class="dropdown-item"><i class="bi bi-person text-primary me-2"></i>Customer View</button>
+                            </form>
+                        </li>
+                        <li>
+                            <form th:action="@{/fast-switch}" method="post">
+                                <input type="hidden" name="email" value="supervisor@test.com">
+                                <input type="hidden" name="redirectUrl" value="/products/manage">
+                                <button type="submit" class="dropdown-item"><i class="bi bi-box-seam text-success me-2"></i>Inventory Manager</button>
+                            </form>
+                        </li>
+                        <li>
+                            <form th:action="@{/fast-switch}" method="post">
+                                <input type="hidden" name="email" value="delivery@test.com">
+                                <input type="hidden" name="redirectUrl" value="/deliveries/manage">
+                                <button type="submit" class="dropdown-item"><i class="bi bi-truck text-info me-2"></i>Delivery Manager</button>
+                            </form>
+                        </li>
+                        <li>
+                            <form th:action="@{/fast-switch}" method="post">
+                                <input type="hidden" name="email" value="support@test.com">
+                                <input type="hidden" name="redirectUrl" value="/support/manage">
+                                <button type="submit" class="dropdown-item"><i class="bi bi-headset text-danger me-2"></i>Support Agent</button>
+                            </form>
+                        </li>
+                        <li>
+                            <form th:action="@{/fast-switch}" method="post">
+                                <input type="hidden" name="email" value="finance@test.com">
+                                <input type="hidden" name="redirectUrl" value="/finance/dashboard">
+                                <button type="submit" class="dropdown-item"><i class="bi bi-bar-chart-line text-success me-2"></i>Finance Executive</button>
+                            </form>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/fast-switch}" method="post">
+                                <input type="hidden" name="email" value="operations@test.com">
+                                <input type="hidden" name="redirectUrl" value="/executive-dashboard">
+                                <button type="submit" class="dropdown-item"><i class="bi bi-diagram-3 text-warning me-2"></i>Operations Manager</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </nav>
 
-    <div class="container mt-4">
-        <!-- Content gets injected here by views using standard Thymeleaf fragment replacement -->
-        <div th:replace="${content} ?: ~{}"></div>
-    </div>
+    </header>
 
-    <footer class="text-center mt-5 py-3 bg-light">
-        <p class="mb-0">© 2026 Lanka Fresh Mart. All rights reserved.</p>
+    <!-- Dynamic Content -->
+    <main class="flex-shrink-0 mb-5">
+        <div th:replace="${content}"></div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto py-5 footer-gradient">
+        <div class="container">
+            <div class="row gy-4 mb-5">
+                <div class="col-lg-4 col-md-6 pe-lg-4">
+                    <a th:href="@{/}" class="brand-text mb-4 mt-1">
+                        <i class="bi bi-basket-fill me-2" style="color: var(--clr-primary);"></i>
+                        <span class="fresh">Fresh</span><span class="mart">Mart</span>
+                    </a>
+                    <p class="text-muted small mb-4">Skip the long lines and heavy bags we'll handle the delivery for you.</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge text-bg-primary px-3 py-2 rounded-1">VISA</span>
+                        <span class="badge text-bg-dark px-3 py-2 rounded-1">MasterCard</span>
+                        <span class="badge text-bg-info text-white px-3 py-2 rounded-1" style="background-color: #6772E5 !important;">stripe</span>
+                        <span class="badge text-bg-black px-3 py-2 rounded-1"><i class="bi bi-apple"></i> Pay</span>
+                    </div>
+                </div>
+                
+                <div class="col-lg-auto col-md-3 col-6 ms-lg-auto">
+                    <h6 class="mb-4 fw-semibold mt-1">Main Pages</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a th:href="@{/}" class="text-muted text-decoration-none small">Home</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none small">About Us</a></li>
+                        <li class="mb-2"><a th:href="@{/products}" class="text-muted text-decoration-none small">Product</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none small">Testimonial</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none small">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-auto col-md-3 col-6 ms-lg-5">
+                    <h6 class="mb-4 fw-semibold mt-1">Support</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none small">Help Center</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none small">Return Policy</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none small">Offer Policy</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none small">Grocery delivery</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none small">Reviews</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-auto col-md-12 ms-lg-5">
+                    <h6 class="mb-4 fw-semibold mt-1">Contact Information</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-3 d-flex align-items-start">
+                            <i class="bi bi-geo-alt me-2 text-muted"></i>
+                            <span class="text-muted small">123 Galle Road,<br>Colombo, Sri Lanka</span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-telephone me-2 text-muted"></i>
+                            <span class="text-muted small">+94 77 123 4567</span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-envelope me-2 text-muted"></i>
+                            <span class="text-muted small">info@lankafreshmart.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center border-top pt-4 mt-4">
+                <span class="text-muted small">Copyright all rights reserved</span>
+                <a th:href="@{/privacy}" class="text-muted text-decoration-none small">Privacy & policy</a>
+                <a th:href="@{/terms}" class="text-muted text-decoration-none small">Terms & Condition</a>
+            </div>
+        </div>
     </footer>
 
+    <!-- Scroll to Top Button -->
+    <button id="scrollTopBtn" class="scroll-top-btn" title="Back to Top">
+        <i class="bi bi-chevron-up"></i>
+    </button>
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Live Search Autocomplete -->
+    <script>
+    (function() {
+        const input = document.getElementById('searchInput');
+        const dropdown = document.getElementById('searchSuggestions');
+        if (!input || !dropdown) return;
+
+        let debounceTimer;
+        let activeIndex = -1;
+
+        input.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            const q = this.value.trim();
+            if (q.length < 2) { dropdown.innerHTML = ''; dropdown.classList.remove('show'); return; }
+            debounceTimer = setTimeout(() => fetchSuggestions(q), 250);
+        });
+
+        input.addEventListener('keydown', function(e) {
+            const items = dropdown.querySelectorAll('.suggestion-item');
+            if (!items.length) return;
+            if (e.key === 'ArrowDown') { e.preventDefault(); activeIndex = Math.min(activeIndex + 1, items.length - 1); highlight(items); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); activeIndex = Math.max(activeIndex - 1, 0); highlight(items); }
+            else if (e.key === 'Enter' && activeIndex >= 0) { e.preventDefault(); items[activeIndex].click(); }
+            else if (e.key === 'Escape') { dropdown.innerHTML = ''; dropdown.classList.remove('show'); }
+        });
+
+        function highlight(items) {
+            items.forEach((el, i) => el.classList.toggle('active', i === activeIndex));
+        }
+
+        async function fetchSuggestions(q) {
+            try {
+                const res = await fetch('/api/search?query=' + encodeURIComponent(q));
+                const data = await res.json();
+                activeIndex = -1;
+                if (!data.length) {
+                    dropdown.innerHTML = '<div class="suggestion-empty"><i class="bi bi-search me-2"></i>No results found</div>';
+                    dropdown.classList.add('show');
+                    return;
+                }
+                dropdown.innerHTML = data.map(p =>
+                    '<div class="suggestion-item">' +
+                        '<a href="/products?query=' + encodeURIComponent(p.name) + '" class="suggestion-link">' +
+                            '<div class="suggestion-img">' +
+                                (p.imageUrl ? '<img src="' + p.imageUrl + '" alt="">' : '<i class="bi bi-basket text-muted"></i>') +
+                            '</div>' +
+                            '<div class="suggestion-info">' +
+                                '<span class="suggestion-name">' + p.name + '</span>' +
+                                '<span class="suggestion-meta">' + p.category + ' &middot; LKR ' + Number(p.price).toFixed(2) + '/' + p.unit + '</span>' +
+                            '</div>' +
+                        '</a>' +
+                        '<button class="suggestion-cart-btn" data-id="' + p.id + '" title="Add to Cart">' +
+                            '<i class="bi bi-cart-plus"></i>' +
+                        '</button>' +
+                    '</div>'
+                ).join('');
+                dropdown.classList.add('show');
+            } catch(err) { console.error(err); }
+        }
+
+        // Handle cart button clicks inside suggestions
+        document.addEventListener('click', function(e) {
+            const cartBtn = e.target.closest('.suggestion-cart-btn');
+            if (cartBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const productId = cartBtn.dataset.id;
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/cart/add/' + productId;
+                // Add CSRF token
+                const csrfToken = document.querySelector('meta[name="_csrf"]');
+                if (csrfToken) {
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden'; csrfInput.name = '_csrf'; csrfInput.value = csrfToken.content;
+                    form.appendChild(csrfInput);
+                }
+                const qtyInput = document.createElement('input');
+                qtyInput.type = 'hidden'; qtyInput.name = 'quantity'; qtyInput.value = '1';
+                form.appendChild(qtyInput);
+                document.body.appendChild(form);
+                form.submit();
+                return;
+            }
+            if (!e.target.closest('.nav-search-center')) { dropdown.innerHTML = ''; dropdown.classList.remove('show'); }
+        });
+    })();
+    </script>
+
+    <!-- Scroll to Top -->
+    <script>
+    (function() {
+        const btn = document.getElementById('scrollTopBtn');
+        if (!btn) return;
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 400) {
+                btn.classList.add('visible');
+            } else {
+                btn.classList.remove('visible');
+            }
+        });
+        btn.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    })();
+    </script>
 </body>
 </html>

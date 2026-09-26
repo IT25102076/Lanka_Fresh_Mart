@@ -1,67 +1,105 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::main})}">
 <head>
     <title>Register - Lanka Fresh Mart</title>
 </head>
 <body>
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card mt-4 shadow-sm">
-                <div class="card-header bg-white text-center">
-                    <h4>Create an Account</h4>
-                </div>
-                <div class="card-body p-4">
-                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-                    
+    <main class="login-page">
+        <div class="login-hero-layout">
+            <!-- Left Side - Hero Image -->
+            <div class="login-hero-image">
+                <img th:src="@{/images/delivery-hero.png}" alt="Delivery Person with Groceries">
+            </div>
+
+            <!-- Right Side - Form -->
+            <div class="login-hero-form">
+                <div class="login-card-floating">
+                    <h3>Create Account</h3>
+                    <p class="text-muted mb-4">Fill in your details to get started</p>
+
+                    <!-- Error Alert -->
+                    <div th:if="${error}" class="alert alert-danger d-flex align-items-center rounded-3 py-2 px-3 mb-3" style="font-size: 0.85rem;">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${error}"></span>
+                    </div>
+
                     <form th:action="@{/register}" th:object="${user}" method="post">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="firstName" class="form-label">First Name</label>
-                                <input type="text" class="form-control" id="firstName" th:field="*{firstName}" required>
-                                <span class="text-danger" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+                        <!-- Name Row -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label for="firstName" class="form-label fw-medium" style="font-size: 0.85rem;">First Name</label>
+                                <div class="login-input-group">
+                                    <i class="bi bi-person"></i>
+                                    <input type="text" class="form-control" id="firstName" th:field="*{firstName}" placeholder="e.g. Nimal" required>
+                                </div>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="lastName" class="form-label">Last Name</label>
-                                <input type="text" class="form-control" id="lastName" th:field="*{lastName}" required>
-                                <span class="text-danger" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+                            <div class="col-6">
+                                <label for="lastName" class="form-label fw-medium" style="font-size: 0.85rem;">Last Name</label>
+                                <div class="login-input-group">
+                                    <i class="bi bi-person"></i>
+                                    <input type="text" class="form-control" id="lastName" th:field="*{lastName}" placeholder="e.g. Perera" required>
+                                </div>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
                             </div>
                         </div>
 
+                        <!-- Email -->
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email address</label>
-                            <input type="email" class="form-control" id="email" th:field="*{email}" required>
-                            <span class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                            <label for="email" class="form-label fw-medium" style="font-size: 0.85rem;">Email Address</label>
+                            <div class="login-input-group">
+                                <i class="bi bi-envelope"></i>
+                                <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="name@example.com" required>
+                            </div>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                         </div>
 
+                        <!-- Password -->
                         <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" th:field="*{password}" required>
-                            <span class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+                            <label for="password" class="form-label fw-medium" style="font-size: 0.85rem;">Password</label>
+                            <div class="login-input-group">
+                                <i class="bi bi-lock"></i>
+                                <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="Create a strong password" required>
+                            </div>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                            <div class="form-text" style="font-size: 0.75rem;"><i class="bi bi-info-circle me-1"></i>Must be at least 8 characters long.</div>
                         </div>
-                        
+
+                        <!-- Phone -->
                         <div class="mb-3">
-                            <label for="phone" class="form-label">Phone (Optional)</label>
-                            <input type="text" class="form-control" id="phone" th:field="*{phone}">
+                            <label for="phone" class="form-label fw-medium" style="font-size: 0.85rem;">Phone Number <span class="text-muted fw-normal">(Optional)</span></label>
+                            <div class="login-input-group">
+                                <i class="bi bi-telephone"></i>
+                                <input type="text" class="form-control" id="phone" th:field="*{phone}" placeholder="+94 XX XXX XXXX">
+                            </div>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="address" class="form-label">Address (Optional)</label>
-                            <textarea class="form-control" id="address" th:field="*{address}" rows="2"></textarea>
+
+                        <!-- Address -->
+                        <div class="mb-4">
+                            <label for="address" class="form-label fw-medium" style="font-size: 0.85rem;">Delivery Address <span class="text-muted fw-normal">(Optional)</span></label>
+                            <div class="login-input-group">
+                                <i class="bi bi-geo-alt" style="top: 24px;"></i>
+                                <textarea class="form-control" id="address" th:field="*{address}" rows="2" placeholder="Street address, city..."></textarea>
+                            </div>
                         </div>
-                        
-                        <!-- Hidden role field, defaults to CUSTOMER from DTO -->
+
+                        <!-- Hidden role field -->
                         <input type="hidden" th:field="*{role}">
 
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-success">Register</button>
-                        </div>
+                        <button type="submit" class="btn login-btn-primary w-100 mb-3">
+                            Create Account <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
                     </form>
-                    <div class="text-center mt-3">
-                        <a th:href="@{/login}">Already have an account? Login here.</a>
+
+                    <div class="login-divider">
+                        <span>Already have an account?</span>
                     </div>
+
+                    <a th:href="@{/login}" class="btn login-btn-outline w-100">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Sign In
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 </body>
 </html>

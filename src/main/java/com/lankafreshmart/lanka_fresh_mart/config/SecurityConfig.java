@@ -22,15 +22,22 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 // Public pages — anyone can access
-                .requestMatchers("/", "/register", "/login", "/fast-switch", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/", "/home", "/register", "/login", "/request-reset-otp", "/reset-password", "/css/**", "/js/**", "/images/**", "/uploads/**", "/privacy", "/terms", "/products", "/api/search").permitAll()
+                // fast-switch is a dev-only tool
+                .requestMatchers("/fast-switch").authenticated()
                 // Role-based access
                 .requestMatchers("/products/manage/**").hasAnyAuthority("STORE_SUPERVISOR", "OPERATIONS_MANAGER")
                 .requestMatchers("/inventory/**").hasAnyAuthority("STORE_SUPERVISOR", "OPERATIONS_MANAGER")
                 .requestMatchers("/orders/manage/**").hasAnyAuthority("CUSTOMER_RELATIONS_OFFICER", "OPERATIONS_MANAGER")
-                .requestMatchers("/delivery/**").hasAnyAuthority("DELIVERY_COORDINATOR", "OPERATIONS_MANAGER")
+                .requestMatchers("/deliveries/manage/**", "/deliveries/update/**").hasAnyAuthority("DELIVERY_COORDINATOR", "OPERATIONS_MANAGER")
+                .requestMatchers("/deliveries/track").hasAuthority("CUSTOMER")
+                .requestMatchers("/drivers/**").hasAnyAuthority("DELIVERY_COORDINATOR", "OPERATIONS_MANAGER")
+                .requestMatchers("/routing/**").hasAnyAuthority("DELIVERY_COORDINATOR", "OPERATIONS_MANAGER")
+                .requestMatchers("/finance/**").hasAnyAuthority("FINANCE_EXECUTIVE", "OPERATIONS_MANAGER")
                 .requestMatchers("/payments/**").hasAnyAuthority("FINANCE_EXECUTIVE", "OPERATIONS_MANAGER")
-                .requestMatchers("/dashboard/**").hasAuthority("OPERATIONS_MANAGER")
-                .requestMatchers("/cart/**", "/orders/my/**", "/checkout/**").hasAuthority("CUSTOMER")
+                .requestMatchers("/dashboard/**", "/executive-dashboard").hasAuthority("OPERATIONS_MANAGER")
+                .requestMatchers("/support/manage/**").hasAnyAuthority("CUSTOMER_RELATIONS_OFFICER", "OPERATIONS_MANAGER")
+                .requestMatchers("/cart/**", "/orders/my-orders/**", "/checkout/**", "/support/my-tickets", "/support/create").hasAuthority("CUSTOMER")
                 // Everything else requires login
                 .anyRequest().authenticated()
             )
@@ -43,6 +50,11 @@ public class SecurityConfig {
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout")
                 .permitAll()
+            )
+            .exceptionHandling(exceptions -> exceptions
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.sendRedirect("/home?error=access_denied");
+                })
             );
 
         return http.build();

@@ -3,6 +3,7 @@ package com.lankafreshmart.lanka_fresh_mart.dto;
 import com.lankafreshmart.lanka_fresh_mart.model.User.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -19,7 +20,10 @@ public class UserDto {
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters")
+    @Pattern(
+        regexp = "^(?=.*[A-Z])(?=.*\\d).{8,}$",
+        message = "Password must be at least 8 characters with at least 1 uppercase letter and 1 number"
+    )
     private String password;
 
     private String phone;

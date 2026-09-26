@@ -32,6 +32,9 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    private String resetOtp;
+    private LocalDateTime resetOtpExpiry;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
