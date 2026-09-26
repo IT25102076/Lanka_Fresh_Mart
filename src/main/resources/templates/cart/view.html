@@ -1,100 +1,134 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::main})}">
 <head>
     <title>Shopping Cart - Lanka Fresh Mart</title>
 </head>
 <body>
-    <div>
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Your Shopping Cart</h2>
-            <a th:href="@{/products}" class="btn btn-outline-primary">Continue Shopping</a>
-        </div>
+    <main class="flex-shrink-0 bg-light py-5">
+        <div class="container mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold mb-0" style="letter-spacing: -1px; font-size: 2rem;"><i class="bi bi-cart3 me-2 text-primary"></i>Your Shopping Cart</h2>
+                <a th:href="@{/products}" class="btn btn-light rounded-pill px-4 py-2 fw-medium text-dark border shadow-sm d-inline-flex align-items-center text-decoration-none transition-all hover-shadow">
+                    <i class="bi bi-arrow-left me-2" style="margin-top: 1px;"></i> Continue Shopping
+                </a>
+            </div>
 
-        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+            <div th:if="${success}" class="alert alert-success border-0 shadow-sm rounded-4 mb-4">
+                <i class="bi bi-check-circle-fill me-2"></i><span th:text="${success}"></span>
+            </div>
+            <div th:if="${error}" class="alert alert-danger border-0 shadow-sm rounded-4 mb-4">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}"></span>
+            </div>
 
-        <div class="row" th:if="${not #lists.isEmpty(cart.items)}">
-            <div class="col-lg-8">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0 align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th class="ps-4">Product</th>
-                                        <th>Price</th>
-                                        <th>Quantity</th>
-                                        <th>Total</th>
-                                        <th class="text-end pe-4">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="item : ${cart.items}">
-                                        <td class="ps-4">
-                                            <div class="d-flex align-items-center">
-                                                <img th:if="${item.product.imageUrl}" th:src="${item.product.imageUrl}" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
-                                                <div class="bg-light rounded me-3 d-flex align-items-center justify-content-center" th:unless="${item.product.imageUrl}" style="width: 50px; height: 50px;">
-                                                    <small class="text-muted">No Img</small>
-                                                </div>
-                                                <div>
-                                                    <h6 class="mb-0" th:text="${item.product.name}">Product Name</h6>
-                                                    <small class="text-muted" th:text="${item.product.unit}">Unit</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td th:text="${#numbers.formatDecimal(item.priceAtTime, 1, 2)} + ' LKR'">150.00 LKR</td>
-                                        <td>
-                                            <form th:action="@{/cart/update/{id}(id=${item.id})}" method="post" class="d-flex align-items-center" style="max-width: 120px;">
-                                                <input type="number" name="quantity" th:value="${item.quantity}" class="form-control form-control-sm me-2" min="1" th:max="${item.product.quantityOnHand}" onchange="this.form.submit()">
-                                            </form>
-                                        </td>
-                                        <td class="fw-bold" th:text="${#numbers.formatDecimal(item.priceAtTime * item.quantity, 1, 2)} + ' LKR'">300.00 LKR</td>
-                                        <td class="text-end pe-4">
-                                            <form th:action="@{/cart/remove/{id}(id=${item.id})}" method="post">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+            <div class="row g-4" th:if="${not #lists.isEmpty(cart.items)}">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                        <div class="card-header bg-white border-bottom py-3 px-4">
+                            <h5 class="mb-0 fw-bold">Cart Items (<span th:text="${#lists.size(cart.items)}">0</span>)</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <!-- Custom Cart Item Rows -->
+                            <div th:each="item, iterStat : ${cart.items}" class="d-flex align-items-center justify-content-between p-4" th:classappend="${!iterStat.last} ? 'border-bottom' : ''">
+                                
+                                <!-- Product Info -->
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <div class="bg-light rounded-3 d-flex align-items-center justify-content-center me-3" style="width: 80px; height: 80px; overflow: hidden; border: 1px solid #f1f5f9;">
+                                        <img th:if="${item.product.imageUrl != null and !item.product.imageUrl.isEmpty()}" th:src="${item.product.imageUrl}" alt="Product Image" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                        <i th:unless="${item.product.imageUrl != null and !item.product.imageUrl.isEmpty()}" class="bi bi-basket text-muted fs-3"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 fw-bold text-dark" style="font-size: 1.1rem;" th:text="${item.product.name}">Product Name</h6>
+                                        <div class="text-muted small mb-1 fw-medium">
+                                            LKR <span th:text="${#numbers.formatDecimal(item.priceAtTime, 1, 2)}">150.00</span> / <span th:text="${item.product.unit}">kg</span>
+                                        </div>
+                                        <div class="badge bg-light text-secondary border fw-medium" style="font-size: 0.75rem;">
+                                            Max available: <span th:text="${item.product.quantityOnHand}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Quantity & Actions -->
+                                <div class="d-flex align-items-center gap-4">
+                                    
+                                    <!-- Stepper -->
+                                    <form th:action="@{/cart/update/{id}(id=${item.id})}" method="post" class="m-0">
+                                        <div class="input-group input-group-sm" style="width: 110px; border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden;">
+                                            <button type="button" class="btn btn-light border-0 px-2" onclick="this.parentNode.querySelector('input[type=number]').stepDown(); this.form.submit();">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <input type="number" name="quantity" class="form-control border-0 text-center fw-bold bg-white p-0" th:value="${item.quantity}" min="1" th:max="${item.product.quantityOnHand}" onchange="this.form.submit()" style="box-shadow: none;">
+                                            <button type="button" class="btn btn-light border-0 px-2" onclick="this.parentNode.querySelector('input[type=number]').stepUp(); this.form.submit();">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                    
+                                    <!-- Price -->
+                                    <div class="fw-bold text-end text-dark" style="min-width: 110px; font-size: 1.1rem;">
+                                        LKR <span th:text="${#numbers.formatDecimal(item.priceAtTime * item.quantity, 1, 2)}">300.00</span>
+                                    </div>
+                                    
+                                    <!-- Delete Button -->
+                                    <form th:action="@{/cart/remove/{id}(id=${item.id})}" method="post" class="m-0">
+                                        <button type="submit" class="btn btn-link text-danger p-2 rounded-circle hover-bg-light transition-all" title="Remove Item" style="text-decoration: none;">
+                                            <i class="bi bi-trash fs-5"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 100px;">
+                        <div class="card-body p-4">
+                            <h5 class="mb-4 fw-bold pb-3 border-bottom">Order Summary</h5>
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-3 text-muted fw-medium">
+                                <span>Subtotal</span>
+                                <span class="text-dark">LKR <span th:text="${#numbers.formatDecimal(#aggregates.sum(cart.items.![priceAtTime * quantity]), 1, 2)}">0.00</span></span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3 text-muted fw-medium">
+                                <span>Delivery Fee</span>
+                                <span class="badge bg-success-subtle text-success border-0 px-3 py-2 rounded-pill fw-bold" style="font-size: 0.75rem;">FREE</span>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top mb-4">
+                                <span class="fw-bold text-dark fs-5">Total</span>
+                                <span class="fw-bold text-primary fs-4">LKR <span th:text="${#numbers.formatDecimal(#aggregates.sum(cart.items.![priceAtTime * quantity]), 1, 2)}">0.00</span></span>
+                            </div>
+                            
+                            <a th:href="@{/checkout}" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2" style="background-color: var(--clr-primary); border: none;">
+                                Proceed to Checkout <i class="bi bi-arrow-right"></i>
+                            </a>
+                            
+                            <div class="text-center mt-4">
+                                <form th:action="@{/cart/clear}" method="post">
+                                    <button type="submit" class="btn btn-link text-danger text-decoration-none btn-sm fw-medium p-0" onclick="return confirm('Are you sure you want to empty your cart?');">
+                                        <i class="bi bi-trash3 me-1"></i> Empty Cart
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="col-lg-4">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title mb-4">Order Summary</h5>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>Subtotal</span>
-                            <span th:text="${#aggregates.sum(cart.items.![priceAtTime * quantity])} + ' LKR'">0.00 LKR</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>Delivery Fee</span>
-                            <span class="text-success">Free (Promo)</span>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between mb-4">
-                            <strong>Total</strong>
-                            <strong class="fs-5 text-primary" th:text="${#aggregates.sum(cart.items.![priceAtTime * quantity])} + ' LKR'">0.00 LKR</strong>
-                        </div>
-                        <a th:href="@{/checkout}" class="btn btn-success w-100 py-2">Proceed to Checkout</a>
-                        <div class="text-center mt-3">
-                            <form th:action="@{/cart/clear}" method="post">
-                                <button type="submit" class="btn btn-link text-danger text-decoration-none btn-sm" onclick="return confirm('Are you sure you want to empty your cart?');">Empty Cart</button>
-                            </form>
-                        </div>
+
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(cart.items)}" class="card border-0 shadow-sm rounded-4 text-center py-5">
+                <div class="card-body py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-cart-x text-muted opacity-50" style="font-size: 5rem;"></i>
                     </div>
+                    <h3 class="fw-bold mb-3">Your cart is empty</h3>
+                    <p class="text-muted mb-4">Looks like you haven't added any fresh groceries to your cart yet.</p>
+                    <a th:href="@{/products}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm" style="background-color: var(--clr-primary); border: none;">
+                        Start Shopping <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
                 </div>
             </div>
         </div>
-
-        <div th:if="${#lists.isEmpty(cart.items)}" class="text-center py-5">
-            <h3 class="text-muted mb-3">Your cart is completely empty</h3>
-            <p class="mb-4">Looks like you haven't added any fresh groceries to your cart yet.</p>
-            <a th:href="@{/products}" class="btn btn-primary px-4 py-2">Start Shopping</a>
-        </div>
-    </div>
+    </main>
 </body>
 </html>

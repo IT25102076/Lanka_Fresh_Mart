@@ -97,16 +97,47 @@ public class OrderDeliveryService {
                 .collect(java.util.stream.Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public Delivery getDeliveryForTracking(Long orderId, String username) {
+        Delivery delivery = deliveryRepository.findByOrderId(orderId).orElse(null);
+        if (delivery != null 
+            && delivery.getOrder().getUser().getEmail().equals(username)) {
+            // Eagerly initialize lazy-loaded collections for the template
+            delivery.getOrder().getItems().size();
+            delivery.getOrder().getItems().forEach(item -> item.getProduct().getName());
+            return delivery;
+        }
+        return null;
+    }
+
     @Transactional
     public void updateDeliveryStatus(Long deliveryId, Delivery.Status newStatus, Long driverId) {
         Delivery delivery = deliveryRepository.findById(deliveryId)
                 .orElseThrow(() -> new RuntimeException("Delivery not found"));
+                
+        // Require driver for DISPATCHED and DELIVERED
+        if ((newStatus == Delivery.Status.DISPATCHED || newStatus == Delivery.Status.DELIVERED) 
+            && delivery.getDriver() == null && driverId == null) {
+            throw new RuntimeException("Cannot dispatch or deliver an order without an assigned driver");
+        }
+        
         delivery.setStatus(newStatus);
+        
+        // Sync order status
+        if (newStatus == Delivery.Status.DELIVERED) {
+            delivery.getOrder().setStatus(Order.Status.DELIVERED);
+            orderRepository.save(delivery.getOrder());
+        } else if (newStatus == Delivery.Status.DISPATCHED) {
+            delivery.getOrder().setStatus(Order.Status.CONFIRMED);
+            orderRepository.save(delivery.getOrder());
+        }
         
         if (driverId != null) {
             com.lankafreshmart.lanka_fresh_mart.model.Driver driver = driverRepository.findById(driverId)
                     .orElseThrow(() -> new RuntimeException("Driver not found"));
             delivery.setDriver(driver);
+        } else {
+            delivery.setDriver(null);
         }
         
         deliveryRepository.save(delivery);

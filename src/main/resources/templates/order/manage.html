@@ -1,89 +1,120 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::main})}">
 <head>
     <title>Manage Orders - Lanka Fresh Mart</title>
 </head>
 <body>
-    <div class="container-fluid my-4">
-        <h2 class="mb-4"><i class="bi bi-list-check"></i> Manage Customer Orders</h2>
+    <main class="page-content bg-light">
+        <div class="container">
+            <div class="page-header">
+                <h2><i class="bi bi-list-check"></i> Manage Orders</h2>
+            </div>
 
-        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+            <div th:if="${success}" class="alert-lfm alert-lfm-success mb-4" th:text="${success}"></div>
+            <div th:if="${error}" class="alert-lfm alert-lfm-danger mb-4" th:text="${error}"></div>
 
-        <div class="card shadow-sm">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Order #</th>
-                                <th>Date</th>
-                                <th>Customer</th>
-                                <th>Items</th>
-                                <th>Total (LKR)</th>
-                                <th>Status</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:if="${#lists.isEmpty(orders)}">
-                                <td colspan="7" class="text-center py-5 text-muted">No orders found.</td>
-                            </tr>
-                            <tr th:each="order : ${orders}">
-                                <td><strong th:text="${'#' + order.id}"></strong></td>
-                                <td th:text="${#temporals.format(order.createdAt, 'dd-MM-yyyy HH:mm')}"></td>
-                                <td>
-                                    <span th:text="${order.user.firstName + ' ' + order.user.lastName}"></span><br>
-                                    <small class="text-muted" th:text="${order.user.email}"></small>
-                                </td>
-                                <td>
-                                    <ul class="list-unstyled mb-0 small text-muted">
-                                        <li th:each="item : ${order.items}">
-                                            <span th:text="${item.quantity + 'x ' + item.product.name}"></span>
-                                        </li>
-                                    </ul>
-                                </td>
-                                <td class="fw-bold text-primary" th:text="${order.totalAmount}"></td>
-                                <td>
-                                    <span class="badge" 
-                                          th:classappend="${order.status.name() == 'PENDING' ? 'bg-warning text-dark' : (order.status.name() == 'CONFIRMED' ? 'bg-info' : 'bg-danger')}"
-                                          th:text="${order.status}">
-                                    </span>
-                                </td>
-                                <td class="text-end">
-                                    <div class="btn-group">
-                                        <!-- Update Status Form -->
-                                        <form th:action="@{/orders/manage/update/{id}(id=${order.id})}" method="post" class="d-inline" th:if="${order.status.name() != 'CANCELLED'}">
-                                            <div class="input-group input-group-sm">
-                                                <select name="status" class="form-select" style="width: auto;">
-                                                    <option value="PENDING" th:selected="${order.status.name() == 'PENDING'}">PENDING</option>
-                                                    <option value="CONFIRMED" th:selected="${order.status.name() == 'CONFIRMED'}">CONFIRMED</option>
-                                                </select>
-                                                <button type="submit" class="btn btn-success">Update</button>
-                                            </div>
-                                        </form>
-
-                                        <!-- Cancel Button (Only if not already cancelled) -->
-                                        <form th:action="@{/orders/manage/cancel/{id}(id=${order.id})}" method="post" class="d-inline ms-2" th:if="${order.status.name() != 'CANCELLED'}">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to CANCEL this order? Stock will be restored.');">
-                                                <i class="bi bi-x-circle"></i> Cancel
+            <div class="card-lfm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">All Customer Orders</h5>
+                    <!-- Simple filter buttons could go here -->
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table-lfm w-100 mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th class="text-end">Total Amount (LKR)</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="order : ${orders}">
+                                    <td class="fw-bold text-primary">#<span th:text="${order.id}"></span></td>
+                                    <td>
+                                        <div class="fw-bold" th:text="${order.user.firstName + ' ' + order.user.lastName}"></div>
+                                        <div class="small text-muted" th:text="${order.user.email}"></div>
+                                    </td>
+                                    <td th:text="${#temporals.format(order.createdAt, 'dd MMM yyyy, HH:mm')}"></td>
+                                    <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(order.totalAmount, 1, 2)}"></td>
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <button class="btn border-0 dropdown-toggle badge-lfm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.5rem 1rem;"
+                                                    th:classappend="${order.status?.name() == 'PENDING' ? 'badge-lfm-warning' : (order.status?.name() == 'CONFIRMED' ? 'badge-lfm-info' : (order.status?.name() == 'DELIVERED' ? 'badge-lfm-success' : (order.status?.name() == 'REFUNDED' ? 'badge-lfm-purple' : 'badge-lfm-danger')))}">
+                                                <span th:text="${order.status != null ? order.status : 'PENDING'}"></span>
                                             </button>
-                                        </form>
-
-                                        <!-- Hard Delete Button (Only for cancelled orders) -->
-                                        <form th:action="@{/orders/manage/delete/{id}(id=${order.id})}" method="post" class="d-inline ms-2" th:if="${order.status.name() == 'CANCELLED'}">
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to PERMANENTLY DELETE this order? This action cannot be undone.');">
-                                                <i class="bi bi-trash"></i> Delete
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="border-radius: var(--radius-md);">
+                                                <li>
+                                                    <form th:action="@{/orders/manage/update/{id}(id=${order.id})}" method="post">
+                                                        <input type="hidden" name="status" value="CONFIRMED">
+                                                        <button type="submit" class="dropdown-item text-success" th:disabled="${order.status?.name() != 'PENDING'}">
+                                                            <i class="bi bi-check-circle me-2"></i> Confirm Order
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form th:action="@{/orders/manage/update/{id}(id=${order.id})}" method="post">
+                                                        <input type="hidden" name="status" value="DELIVERED">
+                                                        <button type="submit" class="dropdown-item text-primary" th:disabled="${order.status?.name() == 'CANCELLED' or order.status?.name() == 'REFUNDED' or order.status?.name() == 'DELIVERED'}">
+                                                            <i class="bi bi-house-check me-2"></i> Mark Delivered
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <form th:action="@{/orders/manage/cancel/{id}(id=${order.id})}" method="post" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                                                        <button type="submit" class="dropdown-item text-danger" th:disabled="${order.status?.name() == 'CANCELLED' or order.status?.name() == 'REFUNDED' or order.status?.name() == 'DELIVERED'}">
+                                                            <i class="bi bi-x-circle me-2"></i> Cancel Order
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(orders)}">
+                                    <td colspan="6" class="text-center py-5 text-muted">
+                                        <div class="empty-state py-0">
+                                            <i class="bi bi-inbox fs-1 opacity-50 mb-3 d-block"></i>
+                                            <h5>No orders found</h5>
+                                            <p>No customer orders are available in the system yet.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+        
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var scrollpos = sessionStorage.getItem('manage_order_scroll');
+                if (scrollpos) {
+                    window.scrollTo(0, scrollpos);
+                    sessionStorage.removeItem('manage_order_scroll');
+                }
+            });
+
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function() {
+                    sessionStorage.setItem('manage_order_scroll', window.scrollY);
+                });
+            });
+
+            // Fix dropdown z-index overlap in tables
+            document.addEventListener('show.bs.dropdown', function (e) {
+                var dropdown = e.target.closest('.dropdown');
+                if (dropdown) dropdown.style.zIndex = '1050';
+            });
+            document.addEventListener('hide.bs.dropdown', function (e) {
+                var dropdown = e.target.closest('.dropdown');
+                if (dropdown) dropdown.style.zIndex = '';
+            });
+        </script>
+    </main>
 </body>
 </html>

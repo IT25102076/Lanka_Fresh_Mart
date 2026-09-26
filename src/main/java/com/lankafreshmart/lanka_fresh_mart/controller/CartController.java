@@ -26,7 +26,8 @@ public class CartController {
 
     @PostMapping("/add/{productId}")
     public String addToCart(@PathVariable Long productId, @RequestParam(defaultValue = "1") int quantity, 
-                            Authentication authentication, RedirectAttributes redirectAttributes) {
+                            Authentication authentication, RedirectAttributes redirectAttributes,
+                            @RequestHeader(value = "Referer", required = false) String referer) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
@@ -36,7 +37,7 @@ public class CartController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/products";
+        return "redirect:" + (referer != null ? referer : "/products");
     }
 
     @PostMapping("/update/{itemId}")

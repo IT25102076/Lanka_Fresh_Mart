@@ -15,7 +15,9 @@ public class Order {
     public enum Status {
         PENDING,
         CONFIRMED,
-        CANCELLED
+        DELIVERED,
+        CANCELLED,
+        REFUNDED
     }
 
     @Id

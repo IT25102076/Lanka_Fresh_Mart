@@ -41,7 +41,7 @@ public class CartService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         if (product.getAvailability() == Product.Availability.UNAVAILABLE || product.getQuantityOnHand() < quantity) {
-            throw new RuntimeException("Product is unavailable or insufficient stock");
+            throw new RuntimeException("Insufficient stock. Only " + product.getQuantityOnHand() + " " + product.getUnit() + " available");
         }
 
         Optional<CartItem> existingItem = cart.getItems().stream()
@@ -79,7 +79,7 @@ public class CartService {
             cartItemRepository.delete(item);
         } else {
             if (item.getProduct().getQuantityOnHand() < quantity) {
-                throw new RuntimeException("Insufficient stock for requested quantity");
+                throw new RuntimeException("Insufficient stock. Only " + item.getProduct().getQuantityOnHand() + " " + item.getProduct().getUnit() + " available");
             }
             item.setQuantity(quantity);
             cartItemRepository.save(item);
