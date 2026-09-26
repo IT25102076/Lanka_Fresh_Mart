@@ -1,69 +1,79 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::main})}">
 <head>
     <title>Process Refunds - Lanka Fresh Mart</title>
 </head>
 <body>
-    <div class="container-fluid my-4">
-        <h2 class="mb-4"><i class="bi bi-cash-stack text-warning"></i> Refund Management</h2>
+    <main class="page-content bg-light">
+        <div class="container">
+            <div class="page-header">
+                <h2><i class="bi bi-cash-stack"></i> Process Refunds</h2>
+                <a th:href="@{/finance/dashboard}" class="btn-lfm-outline"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+            </div>
 
-        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+            <div th:if="${success}" class="alert-lfm alert-lfm-success mb-4" th:text="${success}"></div>
+            <div th:if="${error}" class="alert-lfm alert-lfm-danger mb-4" th:text="${error}"></div>
 
-        <div class="card shadow-sm">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Refund #</th>
-                                <th>Generated Date</th>
-                                <th>Order #</th>
-                                <th>Customer</th>
-                                <th>Amount (LKR)</th>
-                                <th>Status</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:if="${#lists.isEmpty(refunds)}">
-                                <td colspan="7" class="text-center py-5 text-muted">No refunds found.</td>
-                            </tr>
-                            <tr th:each="refund : ${refunds}">
-                                <td><strong th:text="${'REF-' + refund.id}"></strong></td>
-                                <td th:text="${#temporals.format(refund.createdAt, 'dd-MM-yyyy HH:mm')}"></td>
-                                <td>
-                                    <a th:href="@{/orders/manage}" class="text-decoration-none" th:text="${'ORD-' + refund.order.id}"></a>
-                                </td>
-                                <td>
-                                    <span th:text="${refund.order.user.firstName + ' ' + refund.order.user.lastName}"></span><br>
-                                    <small class="text-muted" th:text="${refund.order.user.email}"></small>
-                                </td>
-                                <td class="fw-bold text-danger" th:text="${refund.amount}"></td>
-                                <td>
-                                    <span class="badge" 
-                                          th:classappend="${refund.status.name() == 'PENDING' ? 'bg-warning text-dark' : 'bg-success'}"
-                                          th:text="${refund.status}">
-                                    </span><br>
-                                    <small class="text-muted" th:if="${refund.status.name() == 'COMPLETED'}" 
-                                           th:text="${'Processed: ' + #temporals.format(refund.processedAt, 'dd-MM-yyyy HH:mm')}"></small>
-                                </td>
-                                <td class="text-end">
-                                    <form th:if="${refund.status.name() == 'PENDING'}" th:action="@{/finance/refunds/process/{id}(id=${refund.id})}" method="post" class="d-inline" onsubmit="return confirm('Confirm processing this refund? Funds should be manually sent to the customer before clicking this.');">
-                                        <button type="submit" class="btn btn-sm btn-success">
-                                            <i class="bi bi-check-circle"></i> Mark as Processed
-                                        </button>
-                                    </form>
-                                    <span th:if="${refund.status.name() == 'COMPLETED'}" class="text-success fw-bold">
-                                        <i class="bi bi-check2-all"></i> Done
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="card-lfm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">Cancelled Orders Pending Refund</span>
+                    <span class="badge-lfm badge-lfm-warning"><span th:text="${#lists.size(refunds)}">0</span> Pending</span>
+                </div>
+                
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table-lfm w-100 mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Date Cancelled</th>
+                                    <th class="text-end">Amount to Refund (LKR)</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="refund : ${refunds}">
+                                    <td>
+                                        <div class="fw-bold text-primary">#<span th:text="${refund.order.id}"></span></div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold" th:text="${refund.order.user.firstName + ' ' + refund.order.user.lastName}"></div>
+                                        <div class="small text-muted" th:text="${refund.order.user.email}"></div>
+                                    </td>
+                                    <td th:text="${#temporals.format(refund.createdAt, 'dd MMM yyyy, HH:mm')}"></td>
+                                    <td class="text-end fw-bold text-danger">
+                                        <span th:text="${#numbers.formatDecimal(refund.amount, 1, 2)}"></span>
+                                    </td>
+                                    <td class="text-center">
+                                        <!-- Simulate refund process -->
+                                        <form th:action="@{/finance/refunds/process/{id}(id=${refund.id})}" method="post" onsubmit="return confirm('Confirm manual refund processed via payment gateway?');">
+                                            <button type="submit" class="btn-lfm-primary btn-lfm-sm" th:disabled="${refund.status?.name() == 'COMPLETED'}">
+                                                <i class="bi bi-check2-circle me-1"></i> <span th:text="${refund.status?.name() == 'COMPLETED' ? 'Refunded' : 'Mark Refunded'}"></span>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(refunds)}">
+                                    <td colspan="5" class="text-center py-5">
+                                        <div class="empty-state py-0">
+                                            <i class="bi bi-check-circle text-success fs-1 mb-2 d-block opacity-75"></i>
+                                            <h5 class="fw-bold">All caught up!</h5>
+                                            <p class="text-muted">There are no pending refunds at this time.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
+            
+            <div class="alert-lfm alert-lfm-info mt-4">
+                <i class="bi bi-info-circle-fill"></i> 
+                <strong>Note:</strong> In this prototype, marking an order as refunded updates the database status. In a real scenario, this would be integrated with Stripe API to issue the actual refund to the customer's card.
+            </div>
         </div>
-    </div>
+    </main>
 </body>
 </html>

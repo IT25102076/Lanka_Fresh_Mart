@@ -15,9 +15,14 @@ import java.util.List;
 public class RefundService {
 
     private final RefundRepository refundRepository;
+    private final com.lankafreshmart.lanka_fresh_mart.repository.OrderRepository orderRepository;
 
     @Transactional
     public void createRefundForOrder(Order order) {
+        // Guard: only create a refund if one doesn't already exist for this order
+        if (refundRepository.findByOrderId(order.getId()).isPresent()) {
+            return; // Refund already exists, do nothing
+        }
         Refund refund = new Refund();
         refund.setOrder(order);
         refund.setAmount(order.getTotalAmount());
@@ -40,6 +45,11 @@ public class RefundService {
         
         refund.setStatus(Refund.Status.COMPLETED);
         refund.setProcessedAt(LocalDateTime.now());
+        
+        Order order = refund.getOrder();
+        order.setStatus(Order.Status.REFUNDED);
+        orderRepository.save(order);
+        
         refundRepository.save(refund);
     }
 }
