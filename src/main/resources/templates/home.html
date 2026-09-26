@@ -1,51 +1,352 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::main})}">
 <head>
-    <title>Home - Lanka Fresh Mart</title>
+    <title>FreshMart</title>
 </head>
 <body>
-    <div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
-        <div class="container-fluid py-5">
-            <h1 class="display-5 fw-bold text-success">Welcome to Lanka Fresh Mart</h1>
-            <p class="col-md-8 fs-4" sec:authorize="isAuthenticated()">
-                Hello, <span sec:authentication="name">User</span>! You are logged in with the role of 
-                <span class="badge bg-primary" sec:authentication="principal.authorities"></span>.
-            </p>
-            <p class="col-md-8 fs-4" sec:authorize="!isAuthenticated()">
-                Please login or register to access the full features of the system.
-            </p>
+    <main>
+        <!-- Dribbble Floating Hero Island -->
+        <div class="hero-island">
+            <h1 class="hero-giant-text animate-fade-down">FreshMart</h1>
             
-            <div class="mt-4" sec:authorize="hasAuthority('STORE_SUPERVISOR')">
-                <a th:href="@{/products/manage}" class="btn btn-primary btn-lg me-2">Manage Products</a>
-                <a th:href="@{/inventory/alerts}" class="btn btn-danger btn-lg">Inventory Alerts</a>
+            <div class="container-fluid position-absolute top-0 start-0 w-100 h-100 p-0 m-0" style="z-index: 10;">
+                
+                <div class="hero-content-left animate-fade-up">
+                    <div class="delivery-pill mb-3 d-inline-flex align-items-center">
+                        <span class="delivery-pill-icon">⚡</span>
+                        <span class="delivery-pill-text">Same-Day Delivery</span>
+                    </div>
+                    <p>Shop from thousands of farm-fresh fruits, vegetables, dairy, and daily essentials at unbeatable prices.</p>
+                    <a th:href="@{/products}" class="btn-shop-now">
+                        Shop Now
+                        <div class="arrow-circle">
+                            <i class="bi bi-chevron-right fs-6"></i>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Center Hero Image -->
+                <div class="hero-center-image d-none d-lg-block animate-zoom-in">
+                    <img th:src="@{/images/delivery-hero.png}" alt="Delivery Driver" class="img-fluid">
+                </div>
+
+                <!-- Sparkle 1 -->
+                <div class="hero-sparkle sparkle-1 animate-float" style="top: 15%; left: 15%;">
+                    ✨
+                </div>
+                <!-- Sparkle 2 -->
+                <div class="hero-sparkle sparkle-2 animate-float-delayed" style="top: 25%; right: 25%;">
+                    ✨
+                </div>
+                <!-- Sparkle 3 -->
+                <div class="hero-sparkle sparkle-3 animate-float" style="bottom: 20%; left: 35%;">
+                    ✨
+                </div>
+
+                <!-- Floating Product Sample -->
+                <div class="hero-floating-card d-none d-md-block animate-float" th:if="${mostSellingProduct != null}">
+                    <!-- Image -->
+                    <div style="height: 140px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center;">
+                        <img th:if="${mostSellingProduct.imageUrl != null and !mostSellingProduct.imageUrl.isEmpty()}" th:src="${mostSellingProduct.imageUrl}" alt="Product Image" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                        <span th:unless="${mostSellingProduct.imageUrl != null and !mostSellingProduct.imageUrl.isEmpty()}" style="font-size: 5rem;">🛍️</span>
+                    </div>
+                    <h6 th:text="${mostSellingProduct.name}">Product Name</h6>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="price" th:text="${mostSellingProduct.price} + ' LKR'">Price LKR</span>
+                        <span class="text-muted text-decoration-line-through small" th:text="${mostSellingProduct.price * 1.2} + ' LKR'">Higher Price</span>
+                    </div>
+                </div>
+
             </div>
-            
-            <div class="mt-4" sec:authorize="hasAuthority('CUSTOMER')">
-                <a th:href="@{/products}" class="btn btn-success btn-lg me-2">Browse Catalogue</a>
-                <a th:href="@{/cart}" class="btn btn-outline-success btn-lg">View Cart</a>
-            </div>
-            
-            <div class="mt-4" sec:authorize="hasAuthority('CUSTOMER_RELATIONS_OFFICER')">
-                <a th:href="@{/orders/manage}" class="btn btn-warning btn-lg me-2">Manage Orders</a>
-                <a th:href="@{/support/manage}" class="btn btn-info btn-lg">Manage Support</a>
-            </div>
-            
-            <div class="mt-4" sec:authorize="hasAuthority('DELIVERY_COORDINATOR')">
-                <a th:href="@{/deliveries/manage}" class="btn btn-secondary btn-lg me-2">Manage Deliveries</a>
-                <a th:href="@{/routing/dashboard}" class="btn btn-info btn-lg">Route Optimization</a>
-            </div>
-            
-            <div class="mt-4" sec:authorize="hasAuthority('FINANCE_EXECUTIVE')">
-                <a th:href="@{/finance/dashboard}" class="btn btn-success btn-lg me-2">Finance Dashboard</a>
-                <a th:href="@{/finance/refunds}" class="btn btn-warning btn-lg">Process Refunds</a>
-            </div>
-            
-            <div class="mt-4" sec:authorize="hasAuthority('OPERATIONS_MANAGER')">
-                <a th:href="@{/executive-dashboard}" class="btn btn-primary btn-lg me-2">Executive Dashboard</a>
-                <a th:href="@{/finance/dashboard}" class="btn btn-success btn-lg">Finance Dashboard</a>
-            </div>
-            
         </div>
-    </div>
+
+        <!-- Popular Categories Section -->
+        <div class="container mt-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="section-title mb-0">Shop by Category</h2>
+                <a href="#all-categories" class="btn-dark-pill">
+                    Show All
+                    <div class="arrow-circle">
+                        <i class="bi bi-chevron-down fs-6"></i>
+                    </div>
+                </a>
+            </div>
+
+            <div id="all-categories" class="row g-4 mb-5">
+                <div class="col-6 col-md-4 col-lg-2 scroll-animate-item">
+                    <a th:href="@{/products(category='VEGETABLES')}" class="text-decoration-none text-dark">
+                        <div class="product-card text-center h-100">
+                            <div class="img-wrapper d-flex justify-content-center align-items-center mb-2" style="height: 80px;">
+                                <span style="font-size: 3rem;">🥕</span>
+                            </div>
+                            <h6 class="mb-0">Vegetables</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 scroll-animate-item">
+                    <a th:href="@{/products(category='FRUITS')}" class="text-decoration-none text-dark">
+                        <div class="product-card text-center h-100">
+                            <div class="img-wrapper d-flex justify-content-center align-items-center mb-2" style="height: 80px;">
+                                <span style="font-size: 3rem;">🍎</span>
+                            </div>
+                            <h6 class="mb-0">Fruits</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 scroll-animate-item">
+                    <a th:href="@{/products(category='MEAT')}" class="text-decoration-none text-dark">
+                        <div class="product-card text-center h-100">
+                            <div class="img-wrapper d-flex justify-content-center align-items-center mb-2" style="height: 80px;">
+                                <span style="font-size: 3rem;">🥩</span>
+                            </div>
+                            <h6 class="mb-0">Meat</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 scroll-animate-item">
+                    <a th:href="@{/products(category='SEAFOOD')}" class="text-decoration-none text-dark">
+                        <div class="product-card text-center h-100">
+                            <div class="img-wrapper d-flex justify-content-center align-items-center mb-2" style="height: 80px;">
+                                <span style="font-size: 3rem;">🐟</span>
+                            </div>
+                            <h6 class="mb-0">Seafood</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 scroll-animate-item">
+                    <a th:href="@{/products(category='DAIRY')}" class="text-decoration-none text-dark">
+                        <div class="product-card text-center h-100">
+                            <div class="img-wrapper d-flex justify-content-center align-items-center mb-2" style="height: 80px;">
+                                <span style="font-size: 3rem;">🥛</span>
+                            </div>
+                            <h6 class="mb-0">Dairy</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 scroll-animate-item">
+                    <a th:href="@{/products(category='BAKERY')}" class="text-decoration-none text-dark">
+                        <div class="product-card text-center h-100">
+                            <div class="img-wrapper d-flex justify-content-center align-items-center mb-2" style="height: 80px;">
+                                <span style="font-size: 3rem;">🥖</span>
+                            </div>
+                            <h6 class="mb-0">Bakery</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 scroll-animate-item">
+                    <a th:href="@{/products(category='BEVERAGES')}" class="text-decoration-none text-dark">
+                        <div class="product-card text-center h-100">
+                            <div class="img-wrapper d-flex justify-content-center align-items-center mb-2" style="height: 80px;">
+                                <span style="font-size: 3rem;">🧃</span>
+                            </div>
+                            <h6 class="mb-0">Beverages</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 scroll-animate-item">
+                    <a th:href="@{/products(category='SNACKS')}" class="text-decoration-none text-dark">
+                        <div class="product-card text-center h-100">
+                            <div class="img-wrapper d-flex justify-content-center align-items-center mb-2" style="height: 80px;">
+                                <span style="font-size: 3rem;">🥨</span>
+                            </div>
+                            <h6 class="mb-0">Snacks</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 scroll-animate-item">
+                    <a th:href="@{/products(category='PERSONAL_CARE')}" class="text-decoration-none text-dark">
+                        <div class="product-card text-center h-100">
+                            <div class="img-wrapper d-flex justify-content-center align-items-center mb-2" style="height: 80px;">
+                                <span style="font-size: 3rem;">🧴</span>
+                            </div>
+                            <h6 class="mb-0">Personal Care</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 scroll-animate-item">
+                    <a th:href="@{/products(category='HOUSEHOLD')}" class="text-decoration-none text-dark">
+                        <div class="product-card text-center h-100">
+                            <div class="img-wrapper d-flex justify-content-center align-items-center mb-2" style="height: 80px;">
+                                <span style="font-size: 3rem;">🧹</span>
+                            </div>
+                            <h6 class="mb-0">Household</h6>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Best Selling Items -->
+        <div class="container mt-5 pt-3">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="section-title mb-0" style="font-weight: 800; letter-spacing: -1px; font-size: 2rem;">Weekly Best Selling items</h2>
+                <a th:href="@{/products}" class="btn-dark-pill">
+                    Show All
+                    <div class="arrow-circle"><i class="bi bi-chevron-right fs-6 text-dark"></i></div>
+                </a>
+            </div>
+
+            <!-- Category Pills -->
+            <ul class="nav nav-pills mb-4 gap-2" id="bestSellingTabs" role="tablist">
+                <li class="nav-item" role="presentation" th:each="entry, iterStat : ${weeklyBestSellingMap}">
+                    <button class="nav-link rounded-pill border px-4 py-2 text-dark" 
+                            th:classappend="${iterStat.index == 0} ? 'active' : ''"
+                            style="font-size: 0.9rem; font-weight: 500; border-color: #E2E8F0 !important;"
+                            th:id="'tab-' + ${iterStat.index}" 
+                            data-bs-toggle="pill" 
+                            th:data-bs-target="'#pane-' + ${iterStat.index}" 
+                            type="button" role="tab"
+                            th:text="${entry.key}"></button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="bestSellingTabsContent">
+                <div class="tab-pane fade" 
+                     th:each="entry, iterStat : ${weeklyBestSellingMap}"
+                     th:classappend="${iterStat.index == 0} ? 'show active' : ''"
+                     th:id="'pane-' + ${iterStat.index}" role="tabpanel">
+                    
+                    <div class="row g-4">
+                        <div class="col-6 col-md-4 col-lg-2 scroll-animate-item" th:each="product : ${entry.value}">
+                            <div class="product-card h-100 p-3 bg-white rounded-4 border-0 shadow-sm text-center">
+                                <div style="height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                                    <img th:if="${product.imageUrl != null and !product.imageUrl.isEmpty()}" th:src="${product.imageUrl}" class="img-fluid" style="max-height: 100%; object-fit: contain;">
+                                    <span th:unless="${product.imageUrl != null and !product.imageUrl.isEmpty()}" style="font-size: 3rem;">🛍️</span>
+                                </div>
+                                <h6 class="mb-1 fw-bold text-truncate text-dark" style="font-size: 0.9rem;" th:text="${product.name}">Product</h6>
+                                <p class="text-muted mb-2" style="font-size: 0.75rem;">Local Farmers</p>
+                                <p class="mb-3 fw-bold text-dark fs-5">
+                                    LKR <span th:text="${product.price}">1.33</span><span class="text-muted fw-normal" style="font-size: 0.8rem;">/ <span th:text="${product.unit}">kg</span></span>
+                                </p>
+                                <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post" class="w-100">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="home-btn-add-cart">
+                                        <i class="bi bi-plus fs-5"></i> Add to Cart
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Most Selling Products -->
+        <div class="container mt-5 pt-4 mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="section-title mb-0" style="font-weight: 800; letter-spacing: -1px; font-size: 2rem;">Most Selling Products</h2>
+                <a th:href="@{/products}" class="btn-dark-pill">
+                    Show All
+                    <div class="arrow-circle"><i class="bi bi-chevron-right fs-6 text-dark"></i></div>
+                </a>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-6 col-md-4 col-lg-2 scroll-animate-item" th:each="product : ${mostSellingProducts}">
+                    <div class="product-card h-100 p-3 bg-white rounded-4 border-0 shadow-sm text-center">
+                        <div style="height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                            <img th:if="${product.imageUrl != null and !product.imageUrl.isEmpty()}" th:src="${product.imageUrl}" class="img-fluid" style="max-height: 100%; object-fit: contain;">
+                            <span th:unless="${product.imageUrl != null and !product.imageUrl.isEmpty()}" style="font-size: 3rem;">🛍️</span>
+                        </div>
+                        <h6 class="mb-1 fw-bold text-truncate text-dark" style="font-size: 0.9rem;" th:text="${product.name}">Product</h6>
+                        <p class="text-muted mb-2" style="font-size: 0.75rem;">Local Farmers</p>
+                        <p class="mb-3 fw-bold text-dark fs-5">
+                            LKR <span th:text="${product.price}">1.33</span><span class="text-muted fw-normal" style="font-size: 0.8rem;">/ <span th:text="${product.unit}">kg</span></span>
+                        </p>
+                        <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post" class="w-100">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="home-btn-add-cart">
+                                <i class="bi bi-plus fs-5"></i> Add to Cart
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                        } else {
+                            entry.target.classList.remove('is-visible');
+                        }
+                    });
+                }, {
+                    threshold: 0.1,
+                    rootMargin: "0px 0px -50px 0px"
+                });
+
+                document.querySelectorAll('.scroll-animate, .scroll-animate-item, .animate-fade-up, .animate-fade-down, .animate-zoom-in').forEach((el) => {
+                    observer.observe(el);
+                });
+            });
+        </script>
+
+        <!-- AJAX Add to Cart -->
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('form[action^="/cart/add"]').forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const btn = this.querySelector('button[type="submit"]');
+                    const originalHtml = btn.innerHTML;
+                    
+                    // Show loading state
+                    btn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i> Adding...';
+                    btn.disabled = true;
+                    
+                    try {
+                        const formData = new FormData(this);
+                        const response = await fetch(this.action, {
+                            method: 'POST',
+                            body: formData,
+                            redirect: 'follow' // It will follow the redirect to /products or back to home
+                        });
+                        
+                        if (response.ok) {
+                            // Extract updated badge count from response
+                            const html = await response.text();
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            const newBadge = doc.querySelector('.cart-badge');
+                            
+                            if (newBadge) {
+                                document.querySelectorAll('.cart-badge').forEach(badge => {
+                                    badge.textContent = newBadge.textContent;
+                                    // simple pop effect
+                                    badge.style.transform = 'scale(1.3)';
+                                    setTimeout(() => badge.style.transform = 'scale(1)', 200);
+                                });
+                            }
+                            
+                            // Show success state on button
+                            btn.innerHTML = '<i class="bi bi-check-lg fs-5"></i> Added!';
+                            btn.style.backgroundColor = '#10b981'; // Green
+                            btn.style.color = '#fff';
+                            
+                            setTimeout(() => {
+                                btn.innerHTML = originalHtml;
+                                btn.disabled = false;
+                                btn.style = ''; // Reset
+                            }, 2000);
+                        }
+                    } catch (error) {
+                        console.error('Error adding to cart:', error);
+                        btn.innerHTML = '<i class="bi bi-x-circle fs-5"></i> Failed';
+                        setTimeout(() => {
+                            btn.innerHTML = originalHtml;
+                            btn.disabled = false;
+                        }, 2000);
+                    }
+                });
+            });
+        });
+        </script>
+    </main>
 </body>
 </html>

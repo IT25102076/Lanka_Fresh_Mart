@@ -19,13 +19,14 @@ public class SupportService {
 
     // CREATE
     @Transactional
-    public SupportTicket createTicket(String email, String subject, String message) {
+    public SupportTicket createTicket(String email, String subject, String phoneNumber, String message) {
         User customer = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
                 
         SupportTicket ticket = new SupportTicket();
         ticket.setCustomer(customer);
         ticket.setSubject(subject);
+        ticket.setPhoneNumber(phoneNumber);
         ticket.setMessage(message);
         ticket.setStatus(SupportTicket.Status.OPEN);
         
@@ -60,7 +61,24 @@ public class SupportService {
 
     // DELETE
     @Transactional
-    public void deleteTicket(Long id) {
-        ticketRepository.deleteById(id);
+    public void deleteTicket(Long id, String requestedByEmail, boolean isAdmin) {
+        SupportTicket ticket = getTicketById(id);
+        
+        // Admins can only delete if the status is RESOLVED
+        if (isAdmin && ticket.getStatus() != SupportTicket.Status.RESOLVED) {
+            throw new RuntimeException("Admins can only delete tickets that have been RESOLVED.");
+        }
+        
+        // Customers can delete if they own the ticket and it is not RESOLVED
+        if (!isAdmin) {
+            if (!ticket.getCustomer().getEmail().equals(requestedByEmail)) {
+                throw new RuntimeException("You are not authorized to delete this ticket.");
+            }
+            if (ticket.getStatus() == SupportTicket.Status.RESOLVED) {
+                throw new RuntimeException("You cannot delete a ticket after it has been RESOLVED.");
+            }
+        }
+        
+        ticketRepository.delete(ticket);
     }
 }

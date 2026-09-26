@@ -1,4 +1,4 @@
-HELP.md
+### Build & Maven ###
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -32,9 +32,22 @@ build/
 ### VS Code ###
 .vscode/
 
+### OS Generated ###
+.DS_Store
+Thumbs.db
+
+### Backup & Temp Files ###
+*.bkp
+*.swp
+*~
+
+### Runtime Directories ###
+/uploads/
+
 ### Custom Folders ###
 /documentation/
 
-### Secrets ###
+### Secrets & Sensitive Files ###
 application-secrets.properties
 *.env
+rewrite_history.sh

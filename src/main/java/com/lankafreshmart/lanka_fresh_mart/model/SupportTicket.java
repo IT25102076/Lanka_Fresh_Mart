@@ -22,6 +22,9 @@ public class SupportTicket {
     @Column(nullable = false)
     private String subject;
 
+    @Column(length = 20)
+    private String phoneNumber;
+
     @Column(nullable = false, length = 1000)
     private String message;
 

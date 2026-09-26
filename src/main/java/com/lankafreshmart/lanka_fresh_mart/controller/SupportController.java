@@ -16,19 +16,21 @@ import java.security.Principal;
 public class SupportController {
 
     private final SupportService supportService;
+    private final com.lankafreshmart.lanka_fresh_mart.repository.UserRepository userRepository;
 
     // CUSTOMER ENDPOINTS
 
     @GetMapping("/my-tickets")
     public String myTickets(Model model, Principal principal) {
         model.addAttribute("tickets", supportService.getTicketsForCustomer(principal.getName()));
+        userRepository.findByEmail(principal.getName()).ifPresent(user -> model.addAttribute("user", user));
         return "support/my-tickets";
     }
 
     @PostMapping("/create")
-    public String createTicket(@RequestParam String subject, @RequestParam String message, Principal principal, RedirectAttributes redirectAttributes) {
+    public String createTicket(@RequestParam String subject, @RequestParam String phoneNumber, @RequestParam String message, Principal principal, RedirectAttributes redirectAttributes) {
         try {
-            supportService.createTicket(principal.getName(), subject, message);
+            supportService.createTicket(principal.getName(), subject, phoneNumber, message);
             redirectAttributes.addFlashAttribute("success", "Ticket created successfully. Our team will get back to you soon!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error creating ticket: " + e.getMessage());
@@ -56,9 +58,20 @@ public class SupportController {
     }
 
     @PostMapping("/delete/{id}")
-    public String deleteTicket(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String customerDeleteTicket(@PathVariable Long id, Principal principal, RedirectAttributes redirectAttributes) {
         try {
-            supportService.deleteTicket(id);
+            supportService.deleteTicket(id, principal.getName(), false);
+            redirectAttributes.addFlashAttribute("success", "Ticket deleted successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error deleting ticket: " + e.getMessage());
+        }
+        return "redirect:/support/my-tickets";
+    }
+
+    @PostMapping("/manage/delete/{id}")
+    public String adminDeleteTicket(@PathVariable Long id, Principal principal, RedirectAttributes redirectAttributes) {
+        try {
+            supportService.deleteTicket(id, principal.getName(), true);
             redirectAttributes.addFlashAttribute("success", "Ticket deleted successfully.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error deleting ticket: " + e.getMessage());
