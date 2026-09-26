@@ -13,6 +13,8 @@ import com.lankafreshmart.lanka_fresh_mart.service.CartService;
 import com.lankafreshmart.lanka_fresh_mart.service.StripeService;
 
 import com.lankafreshmart.lanka_fresh_mart.service.DriverService;
+import com.lankafreshmart.lanka_fresh_mart.repository.RefundRepository;
+import com.lankafreshmart.lanka_fresh_mart.model.Refund;
 
 @Controller
 @RequiredArgsConstructor
@@ -22,11 +24,17 @@ public class DeliveryController {
     private final CartService cartService;
     private final StripeService stripeService;
     private final DriverService driverService;
+    private final RefundRepository refundRepository;
 
     @GetMapping("/checkout")
-    public String viewCheckoutPage(Authentication authentication, RedirectAttributes redirectAttributes) {
+    public String viewCheckoutPage(Authentication authentication, Model model, RedirectAttributes redirectAttributes) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
+        }
+        try {
+            model.addAttribute("cart", cartService.getCartForUser(authentication.getName()));
+        } catch (Exception e) {
+            // Cart may be empty or user not found, proceed anyway
         }
         return "delivery/checkout";
     }
@@ -57,7 +65,7 @@ public class DeliveryController {
                 String deliveryAddress = session.getMetadata().get("deliveryAddress");
                 Delivery delivery = deliveryService.createOrderFromCart(authentication.getName(), deliveryAddress);
                 redirectAttributes.addFlashAttribute("success", "Payment successful! Order placed. Track your delivery here.");
-                return "redirect:/deliveries/track";
+                return "redirect:/deliveries/track?orderId=" + delivery.getOrder().getId();
             } else {
                 redirectAttributes.addFlashAttribute("error", "Payment not completed.");
                 return "redirect:/cart";
@@ -75,11 +83,26 @@ public class DeliveryController {
     }
 
     @GetMapping("/deliveries/track")
-    public String trackDeliveries(Model model, Authentication authentication) {
+    public String trackDeliveries(@RequestParam(required = false) Long orderId, Model model, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
-        model.addAttribute("deliveries", deliveryService.getUserDeliveries(authentication.getName()));
+        
+        if (orderId != null) {
+            Delivery delivery = deliveryService.getDeliveryForTracking(orderId, authentication.getName());
+            if (delivery != null) {
+                model.addAttribute("delivery", delivery);
+                
+                // For cancelled orders, look up refund status from the refunds table
+                if (delivery.getOrder().getStatus() == com.lankafreshmart.lanka_fresh_mart.model.Order.Status.CANCELLED) {
+                    Refund refund = refundRepository.findByOrderId(orderId).orElse(null);
+                    model.addAttribute("refund", refund);
+                }
+            } else {
+                model.addAttribute("error", "Invalid Order ID or you don't have permission to view it.");
+            }
+        }
+        
         return "delivery/track";
     }
 

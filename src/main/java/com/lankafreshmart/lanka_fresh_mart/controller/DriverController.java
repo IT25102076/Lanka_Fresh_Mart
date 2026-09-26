@@ -21,13 +21,13 @@ public class DriverController {
         return "driver/list";
     }
 
-    @GetMapping("/create")
+    @GetMapping("/add")
     public String showCreateForm(Model model) {
         model.addAttribute("driver", new Driver());
         return "driver/form";
     }
 
-    @PostMapping("/create")
+    @PostMapping("/add")
     public String saveDriver(@ModelAttribute Driver driver, RedirectAttributes redirectAttributes) {
         try {
             driverService.saveDriver(driver);
@@ -51,6 +51,8 @@ public class DriverController {
             existing.setName(driver.getName());
             existing.setPhone(driver.getPhone());
             existing.setVehicleType(driver.getVehicleType());
+            existing.setVehicleNumber(driver.getVehicleNumber());
+            existing.setStatus(driver.getStatus());
             driverService.saveDriver(existing);
             redirectAttributes.addFlashAttribute("success", "Driver updated successfully.");
         } catch (Exception e) {

@@ -18,6 +18,7 @@ public class RoutingService {
 
     private final DeliveryRouteRepository routeRepository;
     private final DeliveryRepository deliveryRepository;
+    private final com.lankafreshmart.lanka_fresh_mart.repository.OrderRepository orderRepository;
     private final com.lankafreshmart.lanka_fresh_mart.repository.DriverRepository driverRepository;
 
     private static final int MAX_DELIVERIES_PER_ROUTE = 5;
@@ -57,6 +58,8 @@ public class RoutingService {
             delivery.setDeliveryRoute(currentRoute);
             currentRoute.getDeliveries().add(delivery);
             delivery.setStatus(Delivery.Status.DISPATCHED); // Update delivery status to dispatched since it's on a route
+            delivery.getOrder().setStatus(com.lankafreshmart.lanka_fresh_mart.model.Order.Status.CONFIRMED);
+            orderRepository.save(delivery.getOrder());
             deliveryRepository.save(delivery);
         }
         
@@ -109,6 +112,8 @@ public class RoutingService {
 
         for (Delivery delivery : route.getDeliveries()) {
             delivery.setStatus(Delivery.Status.DELIVERED);
+            delivery.getOrder().setStatus(com.lankafreshmart.lanka_fresh_mart.model.Order.Status.DELIVERED);
+            orderRepository.save(delivery.getOrder());
             deliveryRepository.save(delivery);
         }
     }
@@ -122,6 +127,8 @@ public class RoutingService {
         for (Delivery delivery : route.getDeliveries()) {
             delivery.setDeliveryRoute(null);
             delivery.setStatus(Delivery.Status.PREPARING);
+            delivery.getOrder().setStatus(com.lankafreshmart.lanka_fresh_mart.model.Order.Status.PENDING);
+            orderRepository.save(delivery.getOrder());
             deliveryRepository.save(delivery);
         }
 

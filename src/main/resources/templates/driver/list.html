@@ -1,62 +1,95 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::main})}">
 <head>
     <title>Manage Drivers - Lanka Fresh Mart</title>
 </head>
 <body>
-    <div>
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="bi bi-person-lines-fill"></i> Driver Management</h2>
-            <a th:href="@{/drivers/create}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add New Driver</a>
-        </div>
+    <main class="page-content bg-light">
+        <div class="container">
+            <div class="page-header">
+                <h2><i class="bi bi-people"></i> Manage Delivery Drivers</h2>
+                <a th:href="@{/drivers/add}" class="btn-lfm-primary"><i class="bi bi-person-plus-fill me-1"></i> Add New Driver</a>
+            </div>
 
-        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+            <div th:if="${success}" class="alert-lfm alert-lfm-success mb-4" th:text="${success}"></div>
+            <div th:if="${error}" class="alert-lfm alert-lfm-danger mb-4" th:text="${error}"></div>
 
-        <div class="card shadow-sm">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0 align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="ps-3">ID</th>
-                                <th>Name</th>
-                                <th>Contact</th>
-                                <th>Vehicle Type</th>
-                                <th>Active Assignments</th>
-                                <th class="text-end pe-3">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="driver : ${drivers}">
-                                <td class="ps-3 fw-bold" th:text="'#' + ${driver.id}">1</td>
-                                <td>
-                                    <div class="fw-bold" th:text="${driver.name}">Name</div>
-                                </td>
-                                <td><i class="bi bi-telephone text-muted"></i> <span th:text="${driver.phone}">Phone</span></td>
-                                <td>
-                                    <span class="badge bg-info text-dark" th:text="${driver.vehicleType}">Van</span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-secondary rounded-pill" th:text="${driver.deliveries.size()}"></span> Deliveries
-                                </td>
-                                <td class="text-end pe-3">
-                                    <div class="btn-group">
-                                        <a th:href="@{/drivers/edit/{id}(id=${driver.id})}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
-                                        <form th:action="@{/drivers/delete/{id}(id=${driver.id})}" method="post" class="d-inline m-0">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this driver?');"><i class="bi bi-trash"></i></button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(drivers)}">
-                                <td colspan="6" class="text-center py-4 text-muted">No drivers found. Add a driver to start dispatching orders!</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="card-lfm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-bold">Driver Fleet Directory</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table-lfm w-100 mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Driver ID</th>
+                                    <th>Driver Profile</th>
+                                    <th>Contact Number</th>
+                                    <th>Vehicle Details</th>
+                                    <th>Status</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="driver : ${drivers}">
+                                    <td class="fw-bold text-muted" th:text="${driver.id}"></td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                                                <span th:text="${#strings.substring(driver.name, 0, 1)}">D</span>
+                                            </div>
+                                            <div class="fw-bold" th:text="${driver.name}"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-telephone text-muted"></i>
+                                            <span th:text="${driver.phone}"></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-truck text-muted"></i>
+                                            <span class="fw-bold" th:text="${driver.vehicleNumber}"></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge-lfm" 
+                                              th:if="${driver.status != null}"
+                                              th:classappend="${driver.status.name() == 'AVAILABLE' ? 'badge-lfm-success' : (driver.status.name() == 'ON_DELIVERY' ? 'badge-lfm-info' : 'badge-lfm-danger')}"
+                                              th:text="${driver.status}">
+                                        </span>
+                                        <span class="badge-lfm badge-lfm-success" th:unless="${driver.status != null}">AVAILABLE</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group">
+                                            <a th:href="@{/drivers/edit/{id}(id=${driver.id})}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <form th:action="@{/drivers/delete/{id}(id=${driver.id})}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to remove this driver?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(drivers)}">
+                                    <td colspan="6" class="text-center py-5 text-muted">
+                                        <div class="empty-state py-0">
+                                            <i class="bi bi-people fs-1 opacity-50 mb-3 d-block"></i>
+                                            <h5>No drivers registered</h5>
+                                            <p>Add drivers to start managing deliveries.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 </body>
 </html>

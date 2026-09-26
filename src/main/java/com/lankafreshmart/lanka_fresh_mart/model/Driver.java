@@ -23,6 +23,16 @@ public class Driver {
 
     private String vehicleType;
 
+    private String vehicleNumber;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    private DriverStatus status = DriverStatus.AVAILABLE;
+
+    public enum DriverStatus {
+        AVAILABLE, ON_DELIVERY, OFF_DUTY
+    }
+
     @Builder.Default
     @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
     private List<DeliveryRoute> deliveryRoutes = new ArrayList<>();

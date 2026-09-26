@@ -1,172 +1,146 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::main})}">
 <head>
     <title>Manage Deliveries - Lanka Fresh Mart</title>
 </head>
 <body>
-    <div>
-        <h2 class="mb-4"><i class="bi bi-truck"></i> Delivery Management Dashboard</h2>
-
-        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-
-        <!-- PREPARING Section -->
-        <div class="card shadow-sm mb-4 border-secondary">
-            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-box-seam"></i> Preparing</h5>
-                <span class="badge bg-light text-dark" th:text="${#lists.size(deliveries.?[status.name() == 'PREPARING'])}">0</span>
+    <main class="page-content bg-light">
+        <div class="container">
+            <div class="page-header">
+                <h2><i class="bi bi-truck"></i> Manage Deliveries</h2>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0 align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="ps-3">Order ID</th>
-                                <th>Customer</th>
-                                <th>Address</th>
-                                <th>Date</th>
-                                <th>Driver</th>
-                                <th>Update</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="delivery : ${deliveries}" th:if="${delivery.status.name() == 'PREPARING'}">
-                                <td class="ps-3 fw-bold" th:text="'#' + ${delivery.order.id}">1</td>
-                                <td>
-                                    <div th:text="${delivery.order.user.firstName + ' ' + delivery.order.user.lastName}">Name</div>
-                                    <small class="text-muted" th:text="${delivery.order.user.phone}">Phone</small>
-                                </td>
-                                <td><small th:text="${delivery.deliveryAddress}">Address</small></td>
-                                <td th:text="${#temporals.format(delivery.order.createdAt, 'dd-MM HH:mm')}">Date</td>
-                                <td>
-                                    <span th:if="${delivery.driver != null}" class="badge bg-info text-dark" th:text="${delivery.driver.name}"></span>
-                                    <span th:if="${delivery.driver == null}" class="text-muted small">Not assigned</span>
-                                </td>
-                                <td>
-                                    <form th:action="@{/deliveries/update/{id}(id=${delivery.id})}" method="post" class="d-flex align-items-center">
-                                        <select name="status" class="form-select form-select-sm me-2" style="width: auto;">
-                                            <option value="PREPARING" selected>PREPARING</option>
-                                            <option value="DISPATCHED">DISPATCHED</option>
-                                            <option value="DELIVERED">DELIVERED</option>
-                                        </select>
-                                        <select name="driverId" class="form-select form-select-sm me-2" style="width: auto;">
-                                            <option value="" disabled th:selected="${delivery.driver == null}">Assign Driver</option>
-                                            <option th:each="d : ${drivers}" th:value="${d.id}" th:text="${d.name + ' (' + d.vehicleType + ')'}" th:selected="${delivery.driver != null and delivery.driver.id == d.id}"></option>
-                                        </select>
-                                        <button type="submit" class="btn btn-sm btn-primary">Save</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div th:if="${#lists.size(deliveries.?[status.name() == 'PREPARING']) == 0}" class="text-center py-3 text-muted">
-                        No deliveries currently being prepared.
+
+            <div th:if="${success}" class="alert-lfm alert-lfm-success mb-4" th:text="${success}"></div>
+            <div th:if="${error}" class="alert-lfm alert-lfm-danger mb-4" th:text="${error}"></div>
+
+            <div class="card-lfm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-bold">Active Deliveries</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table-lfm w-100 mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Address</th>
+                                    <th>Driver</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="delivery : ${deliveries}">
+                                    <td class="fw-bold text-primary">#<span th:text="${delivery.order.id}"></span></td>
+                                    <td>
+                                        <div class="fw-bold" th:text="${delivery.order.user.firstName + ' ' + delivery.order.user.lastName}"></div>
+                                    </td>
+                                    <td>
+                                        <div style="max-width: 250px;" class="text-truncate" th:title="${delivery.deliveryAddress}" th:text="${delivery.deliveryAddress}"></div>
+                                    </td>
+                                    <td>
+                                        <!-- Auto-submit driver assignment -->
+                                        <form th:action="@{/deliveries/update/{id}(id=${delivery.id})}" method="post" class="lfm-form">
+                                            <input type="hidden" name="status" th:value="${delivery.status}">
+                                            <select name="driverId" class="form-select form-select-sm" style="min-width: 130px; border-radius: var(--radius-pill);" onchange="sessionStorage.setItem('manage_delivery_scroll', window.scrollY); this.form.submit()">
+                                                <option value="">Unassigned</option>
+                                                <option th:each="d : ${drivers}" 
+                                                        th:value="${d.id}" 
+                                                        th:text="${d.name} + ' (' + ${d.vehicleType} + ')'"
+                                                        th:selected="${delivery.driver != null and delivery.driver.id == d.id}">
+                                                </option>
+                                            </select>
+                                        </form>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex align-items-center justify-content-center gap-1">
+                                            <!-- Preparing -->
+                                            <form th:action="@{/deliveries/update/{id}(id=${delivery.id})}" method="post" class="m-0">
+                                                <input type="hidden" name="status" value="PREPARING">
+                                                <input type="hidden" name="driverId" th:value="${delivery.driver?.id}">
+                                                <button type="submit" class="btn p-0 border-0" th:disabled="${delivery.status.name() == 'PREPARING'}">
+                                                    <span class="badge-lfm" 
+                                                          th:classappend="${delivery.status.name() == 'PREPARING' ? 'badge-lfm-warning' : 'border border-secondary border-opacity-25 text-secondary bg-transparent'}">
+                                                        PREPARING
+                                                    </span>
+                                                </button>
+                                            </form>
+                                            
+                                            <i class="bi bi-chevron-right text-muted opacity-50" style="font-size: 0.6rem;"></i>
+                                            
+                                            <!-- Dispatched -->
+                                            <form th:action="@{/deliveries/update/{id}(id=${delivery.id})}" method="post" class="m-0">
+                                                <input type="hidden" name="status" value="DISPATCHED">
+                                                <input type="hidden" name="driverId" th:value="${delivery.driver?.id}">
+                                                <button type="submit" class="btn p-0 border-0" 
+                                                        th:disabled="${delivery.status.name() == 'DISPATCHED' or delivery.driver == null}"
+                                                        th:title="${delivery.driver == null ? 'Driver required' : ''}">
+                                                    <span class="badge-lfm" 
+                                                          th:classappend="${delivery.status.name() == 'DISPATCHED' ? 'badge-lfm-info shadow-sm' : 'border border-secondary border-opacity-25 text-secondary bg-transparent'}">
+                                                        DISPATCHED
+                                                    </span>
+                                                </button>
+                                            </form>
+
+                                            <i class="bi bi-chevron-right text-muted opacity-50" style="font-size: 0.6rem;"></i>
+                                            
+                                            <!-- Delivered -->
+                                            <form th:action="@{/deliveries/update/{id}(id=${delivery.id})}" method="post" class="m-0">
+                                                <input type="hidden" name="status" value="DELIVERED">
+                                                <input type="hidden" name="driverId" th:value="${delivery.driver?.id}">
+                                                <button type="submit" class="btn p-0 border-0" 
+                                                        th:disabled="${delivery.status.name() == 'DELIVERED' or delivery.driver == null}"
+                                                        th:title="${delivery.driver == null ? 'Driver required' : ''}">
+                                                    <span class="badge-lfm" 
+                                                          th:classappend="${delivery.status.name() == 'DELIVERED' ? 'badge-lfm-success shadow-sm' : 'border border-secondary border-opacity-25 text-secondary bg-transparent'}">
+                                                        DELIVERED
+                                                    </span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(deliveries)}">
+                                    <td colspan="6" class="text-center py-5 text-muted">
+                                        <div class="empty-state py-0">
+                                            <i class="bi bi-truck fs-1 opacity-50 mb-3 d-block"></i>
+                                            <h5>No active deliveries</h5>
+                                            <p>All orders have been delivered or there are no pending orders.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var scrollpos = sessionStorage.getItem('manage_delivery_scroll');
+                if (scrollpos) {
+                    window.scrollTo(0, scrollpos);
+                    sessionStorage.removeItem('manage_delivery_scroll');
+                }
+            });
 
-        <!-- DISPATCHED Section -->
-        <div class="card shadow-sm mb-4 border-warning">
-            <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-send"></i> Dispatched</h5>
-                <span class="badge bg-dark" th:text="${#lists.size(deliveries.?[status.name() == 'DISPATCHED'])}">0</span>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0 align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="ps-3">Order ID</th>
-                                <th>Customer</th>
-                                <th>Address</th>
-                                <th>Date</th>
-                                <th>Driver</th>
-                                <th>Update</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="delivery : ${deliveries}" th:if="${delivery.status.name() == 'DISPATCHED'}">
-                                <td class="ps-3 fw-bold" th:text="'#' + ${delivery.order.id}">1</td>
-                                <td>
-                                    <div th:text="${delivery.order.user.firstName + ' ' + delivery.order.user.lastName}">Name</div>
-                                    <small class="text-muted" th:text="${delivery.order.user.phone}">Phone</small>
-                                </td>
-                                <td><small th:text="${delivery.deliveryAddress}">Address</small></td>
-                                <td th:text="${#temporals.format(delivery.order.createdAt, 'dd-MM HH:mm')}">Date</td>
-                                <td>
-                                    <span th:if="${delivery.driver != null}" class="badge bg-info text-dark" th:text="${delivery.driver.name}"></span>
-                                    <span th:if="${delivery.driver == null}" class="text-muted small">Not assigned</span>
-                                </td>
-                                <td>
-                                    <form th:action="@{/deliveries/update/{id}(id=${delivery.id})}" method="post" class="d-flex align-items-center">
-                                        <select name="status" class="form-select form-select-sm me-2" style="width: auto;">
-                                            <option value="PREPARING">PREPARING</option>
-                                            <option value="DISPATCHED" selected>DISPATCHED</option>
-                                            <option value="DELIVERED">DELIVERED</option>
-                                        </select>
-                                        <select name="driverId" class="form-select form-select-sm me-2" style="width: auto;">
-                                            <option value="" disabled th:selected="${delivery.driver == null}">Assign Driver</option>
-                                            <option th:each="d : ${drivers}" th:value="${d.id}" th:text="${d.name + ' (' + d.vehicleType + ')'}" th:selected="${delivery.driver != null and delivery.driver.id == d.id}"></option>
-                                        </select>
-                                        <button type="submit" class="btn btn-sm btn-warning">Save</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div th:if="${#lists.size(deliveries.?[status.name() == 'DISPATCHED']) == 0}" class="text-center py-3 text-muted">
-                        No dispatched deliveries.
-                    </div>
-                </div>
-            </div>
-        </div>
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function() {
+                    sessionStorage.setItem('manage_delivery_scroll', window.scrollY);
+                });
+            });
 
-        <!-- DELIVERED Section -->
-        <div class="card shadow-sm mb-4 border-success">
-            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-check-circle"></i> Delivered</h5>
-                <span class="badge bg-light text-dark" th:text="${#lists.size(deliveries.?[status.name() == 'DELIVERED'])}">0</span>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0 align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="ps-3">Order ID</th>
-                                <th>Customer</th>
-                                <th>Address</th>
-                                <th>Date</th>
-                                <th>Driver</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="delivery : ${deliveries}" th:if="${delivery.status.name() == 'DELIVERED'}">
-                                <td class="ps-3 fw-bold" th:text="'#' + ${delivery.order.id}">1</td>
-                                <td>
-                                    <div th:text="${delivery.order.user.firstName + ' ' + delivery.order.user.lastName}">Name</div>
-                                    <small class="text-muted" th:text="${delivery.order.user.phone}">Phone</small>
-                                </td>
-                                <td><small th:text="${delivery.deliveryAddress}">Address</small></td>
-                                <td th:text="${#temporals.format(delivery.order.createdAt, 'dd-MM HH:mm')}">Date</td>
-                                <td>
-                                    <span th:if="${delivery.driver != null}" class="badge bg-info text-dark" th:text="${delivery.driver.name}"></span>
-                                    <span th:if="${delivery.driver == null}" class="text-muted small">—</span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-success">DELIVERED</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div th:if="${#lists.size(deliveries.?[status.name() == 'DELIVERED']) == 0}" class="text-center py-3 text-muted">
-                        No delivered orders yet.
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
+            // Fix dropdown z-index overlap in tables
+            document.addEventListener('show.bs.dropdown', function (e) {
+                var dropdown = e.target.closest('.dropdown');
+                if (dropdown) dropdown.style.zIndex = '1050';
+            });
+            document.addEventListener('hide.bs.dropdown', function (e) {
+                var dropdown = e.target.closest('.dropdown');
+                if (dropdown) dropdown.style.zIndex = '';
+            });
+        </script>
+    </main>
 </body>
 </html>

@@ -1,39 +1,266 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::main})}">
 <head>
-    <title>Track Deliveries - Lanka Fresh Mart</title>
+    <title>Track Delivery - Lanka Fresh Mart</title>
 </head>
 <body>
-    <div>
-        <h2 class="mb-4">Track Your Deliveries</h2>
+    <main class="page-content bg-light">
+        <div class="container my-4">
+            <div class="page-header">
+                <h2><i class="bi bi-geo-alt"></i> Track Order</h2>
+                <a th:href="@{/orders/my-orders}" class="btn-lfm-primary"><i class="bi bi-arrow-left me-1"></i> Back to Orders</a>
+            </div>
 
-        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div th:if="${success}" class="alert-lfm alert-lfm-success mb-4" th:text="${success}"></div>
+            <div th:if="${error}" class="alert-lfm alert-lfm-danger mb-4" th:text="${error}"></div>
 
-        <div class="row" th:if="${not #lists.isEmpty(deliveries)}">
-            <div class="col-md-6 mb-4" th:each="delivery : ${deliveries}">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header d-flex justify-content-between align-items-center"
-                         th:classappend="${delivery.status.name() == 'DELIVERED'} ? 'bg-success text-white' : 'bg-light'">
-                        <span class="fw-bold">Order #<span th:text="${delivery.order.id}"></span></span>
-                        <span class="badge rounded-pill" 
-                              th:classappend="${delivery.status.name() == 'PREPARING'} ? 'bg-secondary' : (${delivery.status.name() == 'DISPATCHED'} ? 'bg-warning text-dark' : (${delivery.status.name() == 'CANCELLED'} ? 'bg-danger' : 'bg-light text-success'))"
-                              th:text="${delivery.status}">STATUS</span>
+            <!-- Tracker Result -->
+            <div th:if="${delivery}" class="row g-4">
+
+                <!-- Left Column: Progress & Details -->
+                <div class="col-lg-8">
+
+                    <!-- ═══════════════════════════════════════════
+                         NORMAL DELIVERY PROGRESS (Non-cancelled)
+                         ═══════════════════════════════════════════ -->
+                    <div th:if="${delivery.order.status?.name() != 'CANCELLED' and delivery.order.status?.name() != 'REFUNDED'}" class="card-lfm shadow-sm mb-4">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 px-4">
+                            <div>
+                                <h5 class="mb-1 fw-bold" style="font-family: 'Plus Jakarta Sans', sans-serif;">Order #<span th:text="${delivery.order.id}"></span></h5>
+                                <div class="text-muted small">Placed on <span th:text="${#temporals.format(delivery.order.createdAt, 'dd MMM yyyy, HH:mm')}"></span></div>
+                            </div>
+                            <span class="badge-lfm fs-6 py-2 px-3" 
+                                  th:classappend="${delivery.status.name() == 'PREPARING' ? 'badge-lfm-warning' : (delivery.status.name() == 'DISPATCHED' ? 'badge-lfm-info' : 'badge-lfm-success')}"
+                                  th:text="${delivery.status}">
+                            </span>
+                        </div>
+                        <div class="card-body px-4 py-4">
+                            <!-- Delivery Progress Stepper -->
+                            <div class="track-stepper">
+                                <div class="track-stepper-line">
+                                    <div class="track-stepper-fill" 
+                                         th:classappend="${delivery.status.name() == 'PREPARING' ? 'fill-step-1' : (delivery.status.name() == 'DISPATCHED' ? 'fill-step-2' : 'fill-step-3')}"></div>
+                                </div>
+                                <!-- Step 1: Preparing -->
+                                <div class="track-step active">
+                                    <div class="track-step-icon active">
+                                        <i class="bi bi-box-seam"></i>
+                                    </div>
+                                    <div class="track-step-label">Preparing</div>
+                                    <div class="track-step-sub">Order received</div>
+                                </div>
+                                <!-- Step 2: Dispatched -->
+                                <div class="track-step" th:classappend="${delivery.status.name() == 'DISPATCHED' || delivery.status.name() == 'DELIVERED' ? 'active' : ''}">
+                                    <div class="track-step-icon" th:classappend="${delivery.status.name() == 'DISPATCHED' || delivery.status.name() == 'DELIVERED' ? 'active' : ''}">
+                                        <i class="bi bi-truck"></i>
+                                    </div>
+                                    <div class="track-step-label">Dispatched</div>
+                                    <div class="track-step-sub">On the way</div>
+                                </div>
+                                <!-- Step 3: Delivered -->
+                                <div class="track-step" th:classappend="${delivery.status.name() == 'DELIVERED' ? 'active' : ''}">
+                                    <div class="track-step-icon" th:classappend="${delivery.status.name() == 'DELIVERED' ? 'active' : ''}">
+                                        <i class="bi bi-house-check"></i>
+                                    </div>
+                                    <div class="track-step-label">Delivered</div>
+                                    <div class="track-step-sub">Completed</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <p class="mb-1 text-muted small">Placed on: <span th:text="${#temporals.format(delivery.order.createdAt, 'dd-MM-yyyy HH:mm')}">Date</span></p>
-                        <h5 class="card-title text-primary"><span th:text="${#numbers.formatDecimal(delivery.order.totalAmount, 1, 2)}"></span> LKR</h5>
-                        <hr>
-                        <p class="mb-1"><strong>Address:</strong> <span th:text="${delivery.deliveryAddress}"></span></p>
-                        <p class="mb-1"><strong>Scheduled:</strong> <span th:text="${#temporals.format(delivery.scheduledDate, 'dd-MM-yyyy')}"></span></p>
+
+                    <!-- ═══════════════════════════════════════════
+                         CANCELLATION / REFUND PROGRESS
+                         ═══════════════════════════════════════════ -->
+                    <div th:if="${delivery.order.status?.name() == 'CANCELLED' or delivery.order.status?.name() == 'REFUNDED'}" class="card-lfm shadow-sm mb-4">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 px-4">
+                            <div>
+                                <h5 class="mb-1 fw-bold" style="font-family: 'Plus Jakarta Sans', sans-serif;">Order #<span th:text="${delivery.order.id}"></span></h5>
+                                <div class="text-muted small">Placed on <span th:text="${#temporals.format(delivery.order.createdAt, 'dd MMM yyyy, HH:mm')}"></span></div>
+                            </div>
+                            <span class="badge-lfm fs-6 py-2 px-3" 
+                                  th:classappend="${delivery.order.status?.name() == 'REFUNDED' ? 'badge-lfm-purple' : 'badge-lfm-danger'}"
+                                  th:text="${delivery.order.status?.name()}"></span>
+                        </div>
+                        <div class="card-body px-4 py-4">
+                            <!-- Cancellation Progress Stepper — driven by refund status -->
+                            <div class="track-stepper">
+                                <div class="track-stepper-line cancel-line">
+                                    <div class="track-stepper-fill cancel-fill" 
+                                         th:classappend="${refund != null && refund.status.name() == 'COMPLETED' ? 'fill-cancel-4' : (refund != null && refund.status.name() == 'PENDING' ? 'fill-cancel-2' : 'fill-cancel-1')}"></div>
+                                </div>
+                                <!-- Step 1: Cancelled (always DONE) -->
+                                <div class="track-step active">
+                                    <div class="track-step-icon cancel-active">
+                                        <i class="bi bi-x-circle"></i>
+                                    </div>
+                                    <div class="track-step-label">Cancelled</div>
+                                    <div class="track-step-sub">Order cancelled</div>
+                                </div>
+                                <!-- Step 2: Waiting -->
+                                <div class="track-step" th:classappend="${refund != null ? 'active' : ''}">
+                                    <div class="track-step-icon" th:classappend="${refund != null ? 'cancel-active' : ''}">
+                                        <i class="bi bi-hourglass-split"></i>
+                                    </div>
+                                    <div class="track-step-label">Waiting</div>
+                                    <div class="track-step-sub" th:text="${refund != null ? 'Under review' : 'Pending review'}"></div>
+                                </div>
+                                <!-- Step 3: Refund -->
+                                <div class="track-step" th:classappend="${refund != null && refund.status.name() == 'COMPLETED' ? 'active' : ''}">
+                                    <div class="track-step-icon" th:classappend="${refund != null && refund.status.name() == 'COMPLETED' ? 'cancel-active' : ''}">
+                                        <i class="bi bi-wallet2"></i>
+                                    </div>
+                                    <div class="track-step-label">Refund</div>
+                                    <div class="track-step-sub" th:text="${refund != null && refund.status.name() == 'COMPLETED' ? 'Amount returned' : 'Pending'}"></div>
+                                </div>
+                                <!-- Step 4: Finished -->
+                                <div class="track-step" th:classappend="${refund != null && refund.status.name() == 'COMPLETED' ? 'active' : ''}">
+                                    <div class="track-step-icon" th:classappend="${refund != null && refund.status.name() == 'COMPLETED' ? 'cancel-finish' : ''}">
+                                        <i class="bi bi-check-lg"></i>
+                                    </div>
+                                    <div class="track-step-label">Finished</div>
+                                    <div class="track-step-sub" th:text="${refund != null && refund.status.name() == 'COMPLETED' ? 'All done' : 'Pending'}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Items Card -->
+                    <div class="card-lfm shadow-sm">
+                        <div class="card-header bg-white py-3 px-4">
+                            <h5 class="mb-0 fw-bold" style="font-family: 'Plus Jakarta Sans', sans-serif;"><i class="bi bi-bag-check me-2" style="color: var(--clr-primary);"></i>Order Items</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table-lfm w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="ps-4">Product</th>
+                                            <th class="text-center">Qty</th>
+                                            <th class="text-end">Unit Price</th>
+                                            <th class="text-end pe-4">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="item : ${delivery.order.items}">
+                                            <td class="ps-4">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <img th:if="${item.product.imageUrl}" th:src="${item.product.imageUrl}" width="44" height="44" class="rounded shadow-sm" style="object-fit: cover;">
+                                                    <div th:unless="${item.product.imageUrl}" class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                                                        <i class="bi bi-image text-muted"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold" th:text="${item.product.name}"></div>
+                                                        <div class="small text-muted" th:text="${item.product.unit}"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center fw-bold" th:text="${item.quantity}"></td>
+                                            <td class="text-end text-muted" th:text="${#numbers.formatDecimal(item.priceAtTime, 1, 2)} + ' LKR'"></td>
+                                            <td class="text-end pe-4 fw-bold" th:text="${#numbers.formatDecimal(item.priceAtTime * item.quantity, 1, 2)} + ' LKR'"></td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="border-top">
+                                            <td colspan="3" class="text-end fw-bold ps-4 py-3" style="font-size: 1.05rem;">Total</td>
+                                            <td class="text-end pe-4 fw-bold py-3" style="color: var(--clr-primary); font-size: 1.1rem;" th:text="${#numbers.formatDecimal(delivery.order.totalAmount, 1, 2)} + ' LKR'"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div th:if="${#lists.isEmpty(deliveries)}" class="text-center py-5">
-            <h4 class="text-muted">You have no active deliveries.</h4>
-            <a th:href="@{/products}" class="btn btn-primary mt-3">Start Shopping</a>
+                <!-- Right Column: Delivery Info & Actions -->
+                <div class="col-lg-4">
+
+                    <!-- Delivery Information Card -->
+                    <div class="card-lfm shadow-sm mb-4">
+                        <div class="card-header bg-white py-3 px-4">
+                            <h5 class="mb-0 fw-bold" style="font-family: 'Plus Jakarta Sans', sans-serif;"><i class="bi bi-pin-map me-2" style="color: var(--clr-primary);"></i>Delivery Info</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="mb-3">
+                                <div class="text-muted small mb-1">Delivery Address</div>
+                                <div class="fw-bold" th:text="${delivery.deliveryAddress}"></div>
+                            </div>
+                            <div class="mb-3" th:if="${delivery.scheduledDate}">
+                                <div class="text-muted small mb-1">Scheduled Date</div>
+                                <div class="fw-bold"><i class="bi bi-calendar3 me-1 text-primary"></i> <span th:text="${#temporals.format(delivery.scheduledDate, 'dd MMM yyyy')}"></span></div>
+                            </div>
+                            <div class="border-top pt-3 mt-3" th:if="${delivery.order.status?.name() != 'CANCELLED' and delivery.order.status?.name() != 'REFUNDED'}">
+                                <div class="text-muted small mb-1">Assigned Driver</div>
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                        <i class="bi bi-person text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold" th:text="${delivery.driver != null ? delivery.driver.name : 'Pending Assignment'}"></div>
+                                        <div th:if="${delivery.driver != null}" class="small text-muted"><i class="bi bi-telephone me-1"></i> <span th:text="${delivery.driver.phone}"></span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions Card -->
+                    <div class="card-lfm shadow-sm">
+                        <div class="card-header bg-white py-3 px-4">
+                            <h5 class="mb-0 fw-bold" style="font-family: 'Plus Jakarta Sans', sans-serif;"><i class="bi bi-lightning me-2" style="color: var(--clr-primary);"></i>Quick Actions</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="d-grid gap-2">
+                                <!-- Delivered badge -->
+                                <div th:if="${delivery.status.name() == 'DELIVERED'}" class="d-flex align-items-center gap-2 p-3 rounded-3" style="background: rgba(25, 135, 84, 0.08); border: 1px solid rgba(25, 135, 84, 0.2);">
+                                    <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                    <div>
+                                        <div class="fw-bold text-success">Order Completed</div>
+                                        <div class="small text-muted">Delivered successfully</div>
+                                    </div>
+                                </div>
+
+                                <!-- Cancelled badge — shows actual refund status -->
+                                <div th:if="${delivery.order.status?.name() == 'CANCELLED' or delivery.order.status?.name() == 'REFUNDED'}" class="d-flex align-items-center gap-2 p-3 rounded-3" 
+                                     th:style="${refund != null && refund.status.name() == 'COMPLETED' ? 'background: rgba(25, 135, 84, 0.08); border: 1px solid rgba(25, 135, 84, 0.2);' : 'background: rgba(220, 53, 69, 0.06); border: 1px solid rgba(220, 53, 69, 0.2);'}">
+                                    <i th:class="${refund != null && refund.status.name() == 'COMPLETED' ? 'bi bi-check-circle-fill text-success fs-5' : 'bi bi-x-circle-fill text-danger fs-5'}"></i>
+                                    <div>
+                                        <div th:class="${refund != null && refund.status.name() == 'COMPLETED' ? 'fw-bold text-success' : 'fw-bold text-danger'}" 
+                                             th:text="${refund != null && refund.status.name() == 'COMPLETED' ? 'Refund Completed' : 'Order Cancelled'}"></div>
+                                        <div class="small text-muted" 
+                                             th:text="${refund != null && refund.status.name() == 'COMPLETED' ? 'Refund processed on ' + #temporals.format(refund.processedAt, 'dd MMM yyyy') : 'Refund is pending review'}"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Cancel button (only if PENDING order) -->
+                                <form th:if="${delivery.order.status?.name() == 'PENDING'}" 
+                                      th:action="@{/orders/my-orders/cancel/{id}(id=${delivery.order.id})}" method="post" 
+                                      onsubmit="return confirm('Are you sure you want to cancel this order? This cannot be undone.');">
+                                    <button type="submit" class="btn-lfm-danger w-100"><i class="bi bi-x-circle me-1"></i> Cancel Order</button>
+                                </form>
+
+                                <a th:href="@{/support/my-tickets}" class="btn btn-outline-secondary rounded-pill w-100">
+                                    <i class="bi bi-headset me-1"></i> Need Help? Contact Support
+                                </a>
+
+                                <a th:href="@{/orders/my-orders}" class="btn btn-light rounded-pill w-100 border">
+                                    <i class="bi bi-arrow-left me-1"></i> Back to My Orders
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- No delivery found state -->
+            <div th:if="${delivery == null && error == null && param.orderId != null}" class="card-lfm empty-state">
+                <i class="bi bi-search empty-icon"></i>
+                <h4 class="mt-3">No delivery found for this order.</h4>
+                <a th:href="@{/orders/my-orders}" class="btn-lfm-accent mt-3 d-inline-block">Back to My Orders</a>
+            </div>
+
         </div>
-    </div>
+    </main>
 </body>
 </html>
