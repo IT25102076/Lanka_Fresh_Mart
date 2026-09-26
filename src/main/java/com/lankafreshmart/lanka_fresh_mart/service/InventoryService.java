@@ -55,6 +55,24 @@ public class InventoryService {
     }
 
     @Transactional
+    public void quickRestock(Long productId, int addedQuantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        
+        // Add new stock
+        product.setQuantityOnHand(product.getQuantityOnHand() + addedQuantity);
+        productRepository.save(product);
+        
+        // Resolve any active alerts for this product
+        Optional<InventoryAlert> activeAlert = alertRepository.findByProductAndIsResolvedFalse(product);
+        activeAlert.ifPresent(alert -> {
+            alert.setResolved(true);
+            alert.setResolvedAt(LocalDateTime.now());
+            alertRepository.save(alert);
+        });
+    }
+
+    @Transactional
     public void createManualAlert(Long productId, String message) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));

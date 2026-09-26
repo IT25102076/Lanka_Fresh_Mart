@@ -1,103 +1,120 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::main})}">
 <head>
     <title>Edit Product - Lanka Fresh Mart</title>
 </head>
 <body>
-    <div>
-        <div class="mb-4">
-            <a th:href="@{/products/manage}" class="btn btn-outline-secondary">&laquo; Back to Products</a>
-        </div>
-        
-        <div class="card shadow-sm max-w-800 mx-auto">
-            <div class="card-header bg-white">
-                <h3 class="mb-0">Edit Product: <span th:text="${product.productCode}">PRD-123</span></h3>
+    <main class="page-content bg-light">
+        <div class="container">
+            <div class="mb-4">
+                <a th:href="@{/products/manage}" class="btn-lfm-outline btn-lfm-sm"><i class="bi bi-arrow-left"></i> Back to Products</a>
             </div>
-            <div class="card-body p-4">
-                <form th:action="@{/products/manage/edit/{id}(id=${product.id})}" th:object="${product}" method="post" enctype="multipart/form-data">
-                    <input type="hidden" th:field="*{productCode}">
-                    
-                    <!-- Basic Info -->
-                    <h5 class="border-bottom pb-2 mb-3">Basic Information</h5>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="name" class="form-label">Product Name *</label>
-                            <input type="text" class="form-control" id="name" th:field="*{name}" required>
+            
+            <div class="card-lfm mx-auto" style="max-width: 800px;">
+                <div class="card-header bg-white d-flex align-items-center">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-pencil-square text-primary me-2"></i>Edit Product: <span th:text="${product.name}" class="text-muted"></span></h4>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/products/manage/edit/{id}(id=${product.id})}" th:object="${product}" method="post" enctype="multipart/form-data" class="lfm-form">
+                        
+                        <!-- Hidden ID field -->
+                        <input type="hidden" th:field="*{id}">
+                        <!-- Hidden creation timestamp to preserve it -->
+                        <input type="hidden" th:field="*{createdAt}">
+                        
+                        <!-- Basic Info -->
+                        <h5 class="border-bottom pb-2 mb-4 text-primary fw-bold">Basic Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Product Name *</label>
+                                <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="category" class="form-label">Category *</label>
+                                <select class="form-select" id="category" th:field="*{category}" required>
+                                    <option th:each="cat : ${T(com.lankafreshmart.lanka_fresh_mart.model.Product.Category).values()}" 
+                                            th:value="${cat}" th:text="${cat}">Category</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="category" class="form-label">Category *</label>
-                            <select class="form-select" id="category" th:field="*{category}" required>
-                                <option value="" disabled>Select Category</option>
-                                <option th:each="cat : ${T(com.lankafreshmart.lanka_fresh_mart.model.Product.Category).values()}" 
-                                        th:value="${cat}" th:text="${cat}">Category</option>
-                            </select>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" th:field="*{description}" rows="3"></textarea>
                         </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" th:field="*{description}" rows="3"></textarea>
-                    </div>
-                    
-                    <div class="mb-4 row">
-                        <div class="col-md-6">
-                            <label for="imageFile" class="form-label">Upload New Image (from PC)</label>
-                            <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
+                        
+                        <div class="mb-4 row">
+                            <div class="col-md-3 text-center align-self-center mb-3 mb-md-0">
+                                <div class="mb-2 text-muted small fw-bold">Current Image</div>
+                                <img th:if="*{imageUrl}" th:src="*{imageUrl}" class="img-thumbnail rounded shadow-sm" style="max-height: 100px;">
+                                <div th:unless="*{imageUrl}" class="text-muted bg-light rounded d-flex align-items-center justify-content-center mx-auto" style="width: 100px; height: 100px;">
+                                    <i class="bi bi-image fs-1 opacity-25"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="mb-3">
+                                    <label for="imageFile" class="form-label">Upload New Image (from PC)</label>
+                                    <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
+                                </div>
+                                <div>
+                                    <label for="imageUrl" class="form-label">Or Provide Image URL</label>
+                                    <input type="text" class="form-control" id="imageUrl" th:field="*{imageUrl}">
+                                </div>
+                                <div class="form-text mt-2 text-muted"><i class="bi bi-info-circle"></i> If both are provided, the uploaded image from your PC will be used.</div>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="imageUrl" class="form-label">Or Provide Image URL</label>
-                            <input type="text" class="form-control" id="imageUrl" th:field="*{imageUrl}" placeholder="https://example.com/image.jpg">
-                        </div>
-                        <div class="form-text mt-2 text-muted">If both are provided, the uploaded image from your PC will overwrite the existing image URL.</div>
-                    </div>
 
-                    <!-- Pricing & Inventory -->
-                    <h5 class="border-bottom pb-2 mb-3">Pricing & Inventory</h5>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="price" class="form-label">Price (LKR) *</label>
-                            <input type="number" step="0.01" class="form-control" id="price" th:field="*{price}" required>
+                        <!-- Pricing & Inventory -->
+                        <h5 class="border-bottom pb-2 mb-4 text-primary fw-bold mt-5">Pricing & Inventory</h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="price" class="form-label">Price (LKR) *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">Rs.</span>
+                                    <input type="number" step="0.01" class="form-control" id="price" th:field="*{price}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="unit" class="form-label">Unit *</label>
+                                <select class="form-select" id="unit" th:field="*{unit}" required>
+                                    <option value="kg">kg (Kilograms)</option>
+                                    <option value="g">g (Grams)</option>
+                                    <option value="L">L (Liters)</option>
+                                    <option value="ml">ml (Milliliters)</option>
+                                    <option value="pieces">pieces</option>
+                                    <option value="packs">packs</option>
+                                    <option value="bunches">bunches</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="availability" class="form-label">Status *</label>
+                                <select class="form-select" id="availability" th:field="*{availability}" required>
+                                    <option th:each="avail : ${T(com.lankafreshmart.lanka_fresh_mart.model.Product.Availability).values()}" 
+                                            th:value="${avail}" th:text="${avail}">Status</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="unit" class="form-label">Unit *</label>
-                            <select class="form-select" id="unit" th:field="*{unit}" required>
-                                <option value="" disabled>Select Unit</option>
-                                <option value="kg">kg (Kilograms)</option>
-                                <option value="g">g (Grams)</option>
-                                <option value="L">L (Liters)</option>
-                                <option value="ml">ml (Milliliters)</option>
-                                <option value="pieces">pieces</option>
-                                <option value="packs">packs</option>
-                                <option value="bunches">bunches</option>
-                            </select>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="quantityOnHand" class="form-label">Stock Quantity *</label>
+                                <input type="number" class="form-control" id="quantityOnHand" th:field="*{quantityOnHand}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="reorderLevel" class="form-label">Reorder Alert Level *</label>
+                                <input type="number" class="form-control" id="reorderLevel" th:field="*{reorderLevel}" required>
+                                <div class="form-text">System will alert when stock drops below this number.</div>
+                            </div>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="availability" class="form-label">Status *</label>
-                            <select class="form-select" id="availability" th:field="*{availability}" required>
-                                <option th:each="avail : ${T(com.lankafreshmart.lanka_fresh_mart.model.Product.Availability).values()}" 
-                                        th:value="${avail}" th:text="${avail}">Status</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="quantityOnHand" class="form-label">Stock Quantity *</label>
-                            <input type="number" class="form-control" id="quantityOnHand" th:field="*{quantityOnHand}" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="reorderLevel" class="form-label">Reorder Alert Level *</label>
-                            <input type="number" class="form-control" id="reorderLevel" th:field="*{reorderLevel}" required>
-                        </div>
-                    </div>
 
-                    <div class="d-flex justify-content-end mt-4">
-                        <a th:href="@{/products/manage}" class="btn btn-secondary me-2">Cancel</a>
-                        <button type="submit" class="btn btn-primary">Update Product</button>
-                    </div>
-                </form>
+                        <div class="d-flex justify-content-end mt-5 pt-3 border-top">
+                            <a th:href="@{/products/manage}" class="btn btn-light me-3 px-4 border">Cancel</a>
+                            <button type="submit" class="btn-lfm-primary"><i class="bi bi-save me-1"></i> Update Product</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
 </body>
 </html>

@@ -17,8 +17,18 @@ public class ProductController {
 
     // Public / Customer view
     @GetMapping
-    public String viewCatalogue(Model model) {
-        model.addAttribute("products", productService.getAvailableProducts());
+    public String viewCatalogue(@RequestParam(required = false) Product.Category category, 
+                                @RequestParam(required = false) String query, 
+                                Model model) {
+        if (query != null && !query.trim().isEmpty()) {
+            model.addAttribute("products", productService.searchProducts(query));
+            model.addAttribute("searchQuery", query);
+        } else if (category != null) {
+            model.addAttribute("products", productService.getProductsByCategory(category));
+            model.addAttribute("selectedCategory", category.name());
+        } else {
+            model.addAttribute("products", productService.getAvailableProducts());
+        }
         return "product/catalogue";
     }
 

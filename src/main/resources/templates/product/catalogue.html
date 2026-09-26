@@ -1,51 +1,120 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::div})}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: html(content=~{::main})}">
 <head>
     <title>Products Catalogue - Lanka Fresh Mart</title>
 </head>
 <body>
-    <div>
-        <div class="text-center mb-5 mt-3">
-            <h1 class="display-5 fw-bold text-success">Our Fresh Products</h1>
-            <p class="text-muted">Browse our selection of the freshest groceries in Sri Lanka.</p>
-        </div>
+    <main class="page-content" style="background-color: #F8F9FA; min-height: 80vh;">
+        <div class="container py-4">
 
-        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-            
-            <div th:each="product : ${products}" class="col">
-                <div class="card h-100 shadow-sm product-card">
-                    <img th:if="${product.imageUrl}" th:src="${product.imageUrl}" class="card-img-top" alt="Product Image" style="height: 200px; object-fit: cover;">
-                    <img th:unless="${product.imageUrl}" th:src="@{/images/placeholder.jpg}" class="card-img-top bg-light" alt="No Image" style="height: 200px; object-fit: contain;">
-                    
-                    <div class="card-body d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title mb-0" th:text="${product.name}">Product Name</h5>
-                            <span class="badge bg-success" th:text="${product.category}">CATEGORY</span>
-                        </div>
-                        <p class="card-text text-muted small flex-grow-1" th:text="${product.description}">Product description goes here.</p>
-                        
-                        <div class="mt-3 d-flex justify-content-between align-items-end">
-                            <div>
-                                <h5 class="text-primary mb-0">
-                                    <span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">150.00</span> LKR
-                                </h5>
-                                <small class="text-muted">per <span th:text="${product.unit}">kg</span></small>
+            <!-- Page Header -->
+            <div class="mb-4">
+                <h2 th:if="${searchQuery != null}" class="section-title" style="font-weight: 800; letter-spacing: -1px; font-size: 2rem;">
+                    Search Results for "<span th:text="${searchQuery}"></span>"
+                </h2>
+                <h2 th:if="${selectedCategory != null && searchQuery == null}" class="section-title" style="font-weight: 800; letter-spacing: -1px; font-size: 2rem;">
+                    <span th:text="${selectedCategory}"></span>
+                </h2>
+                <h2 th:if="${searchQuery == null && selectedCategory == null}" class="section-title" style="font-weight: 800; letter-spacing: -1px; font-size: 2rem;">
+                    Our Fresh Products
+                </h2>
+                
+                <p th:if="${searchQuery != null}" class="text-muted mb-0">Here are the items matching your search query.</p>
+                <p th:if="${selectedCategory != null && searchQuery == null}" class="text-muted mb-0">Browse our selection of the freshest items in this category.</p>
+                <p th:if="${searchQuery == null && selectedCategory == null}" class="text-muted mb-0">Browse our selection of the freshest groceries in Sri Lanka.</p>
+            </div>
+
+            <!-- Category Filter Pills -->
+            <div class="d-flex flex-wrap gap-2 mb-4" th:if="${searchQuery == null}">
+                <a th:href="@{/products}" 
+                   class="category-pill" 
+                   th:classappend="${selectedCategory == null} ? 'active' : ''">All</a>
+                <a th:href="@{/products(category='VEGETABLES')}" 
+                   class="category-pill"
+                   th:classappend="${selectedCategory == 'VEGETABLES'} ? 'active' : ''">🥕 Vegetables</a>
+                <a th:href="@{/products(category='FRUITS')}" 
+                   class="category-pill"
+                   th:classappend="${selectedCategory == 'FRUITS'} ? 'active' : ''">🍎 Fruits</a>
+                <a th:href="@{/products(category='DAIRY')}" 
+                   class="category-pill"
+                   th:classappend="${selectedCategory == 'DAIRY'} ? 'active' : ''">🥛 Dairy & Eggs</a>
+                <a th:href="@{/products(category='BAKERY')}" 
+                   class="category-pill"
+                   th:classappend="${selectedCategory == 'BAKERY'} ? 'active' : ''">🥖 Bakery</a>
+                <a th:href="@{/products(category='MEAT')}" 
+                   class="category-pill"
+                   th:classappend="${selectedCategory == 'MEAT'} ? 'active' : ''">🥩 Meat</a>
+                <a th:href="@{/products(category='SEAFOOD')}" 
+                   class="category-pill"
+                   th:classappend="${selectedCategory == 'SEAFOOD'} ? 'active' : ''">🐟 Seafood</a>
+                <a th:href="@{/products(category='BEVERAGES')}" 
+                   class="category-pill"
+                   th:classappend="${selectedCategory == 'BEVERAGES'} ? 'active' : ''">🧃 Beverages</a>
+                <a th:href="@{/products(category='SNACKS')}" 
+                   class="category-pill"
+                   th:classappend="${selectedCategory == 'SNACKS'} ? 'active' : ''">🥨 Snacks</a>
+            </div>
+
+            <!-- Back to all products link when searching -->
+            <div th:if="${searchQuery != null}" class="mb-4">
+                <a th:href="@{/products}" class="btn btn-outline-secondary rounded-pill px-4 py-2" style="font-size: 0.85rem;">
+                    <i class="bi bi-arrow-left me-2"></i>Back to All Products
+                </a>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3">
+                
+                <div th:each="product : ${products}" class="col">
+                    <div class="catalogue-card" th:style="${product.quantityOnHand <= 0 or product.availability.name() == 'UNAVAILABLE'} ? 'opacity: 0.6; pointer-events: none;' : ''">
+                        <!-- Product Image -->
+                        <div class="catalogue-card-img" style="position: relative;">
+                            <span class="catalogue-badge" th:text="${product.category}" th:if="${product.quantityOnHand > 0 and product.availability.name() == 'AVAILABLE'}">CATEGORY</span>
+                            <span class="catalogue-badge bg-danger text-white" th:if="${product.quantityOnHand <= 0 or product.availability.name() == 'UNAVAILABLE'}">OUT OF STOCK</span>
+                            
+                            <img th:if="${product.imageUrl != null and !product.imageUrl.isEmpty()}" 
+                                 th:src="${product.imageUrl}" alt="Product Image"
+                                 th:style="${product.quantityOnHand <= 0 or product.availability.name() == 'UNAVAILABLE'} ? 'filter: grayscale(100%);' : ''">
+                            <div th:unless="${product.imageUrl != null and !product.imageUrl.isEmpty()}" 
+                                 class="d-flex align-items-center justify-content-center h-100">
+                                <i class="bi bi-basket" style="font-size: 3rem; color: #ccc;"></i>
                             </div>
-                            <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post">
-                                <input type="hidden" name="quantity" value="1">
-                                <button type="submit" class="btn btn-outline-success btn-sm">Add to Cart</button>
-                            </form>
+                        </div>
+                        
+                        <!-- Product Info -->
+                        <div class="catalogue-card-body">
+                            <h6 class="catalogue-card-name" th:text="${product.name}">Product Name</h6>
+                            <p class="catalogue-card-desc" th:text="${product.description}">Description</p>
+                            
+                            <div class="catalogue-card-footer">
+                                <div>
+                                    <span class="catalogue-price">LKR <span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">150.00</span></span>
+                                    <span class="catalogue-unit">/ <span th:text="${product.unit}">kg</span></span>
+                                </div>
+                                <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="catalogue-btn-add" th:disabled="${product.quantityOnHand <= 0 or product.availability.name() == 'UNAVAILABLE'}">
+                                        <i class="bi bi-plus" th:if="${product.quantityOnHand > 0 and product.availability.name() == 'AVAILABLE'}"></i>
+                                        <i class="bi bi-x" th:if="${product.quantityOnHand <= 0 or product.availability.name() == 'UNAVAILABLE'}"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
+                
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(products)}" class="col-12">
+                    <div class="text-center py-5">
+                        <i class="bi bi-basket" style="font-size: 4rem; color: #ccc;"></i>
+                        <h4 class="mt-3 text-muted">No products available</h4>
+                        <p class="text-muted">We're restocking our fresh supplies. Please check back later!</p>
+                        <a th:href="@{/products}" class="btn btn-outline-secondary rounded-pill px-4 mt-2">View All Products</a>
+                    </div>
+                </div>
+                
             </div>
-            
-            <div th:if="${#lists.isEmpty(products)}" class="col-12 text-center py-5">
-                <h3 class="text-muted">No products available at the moment.</h3>
-                <p>Please check back later!</p>
-            </div>
-            
         </div>
-    </div>
+    </main>
 </body>
 </html>

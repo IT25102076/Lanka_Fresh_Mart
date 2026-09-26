@@ -25,6 +25,63 @@ public class ProductService {
         return productRepository.findByAvailability(Product.Availability.AVAILABLE);
     }
 
+    public List<Product> getProductsByCategory(Product.Category category) {
+        return productRepository.findByCategory(category).stream()
+                .filter(p -> p.getAvailability() == Product.Availability.AVAILABLE)
+                .toList();
+    }
+
+    public List<Product> searchProducts(String query) {
+        return productRepository.findByNameContainingIgnoreCase(query).stream()
+                .filter(p -> p.getAvailability() == Product.Availability.AVAILABLE)
+                .toList();
+    }
+
+    public Product getMostSellingProduct() {
+        return productRepository.findMostSellingProduct().orElseGet(() -> {
+            List<Product> available = getAvailableProducts();
+            return available.isEmpty() ? null : available.get(0);
+        });
+    }
+
+    public List<Product> getMostSellingProducts(int limit) {
+        List<Product> products = new java.util.ArrayList<>(productRepository.findTopSellingProducts(org.springframework.data.domain.PageRequest.of(0, limit)));
+        if (products.size() < limit) {
+            List<Product> available = getAvailableProducts();
+            for (Product p : available) {
+                if (products.size() >= limit) break;
+                if (!products.contains(p)) products.add(p);
+            }
+        }
+        return products;
+    }
+
+    public List<Product> getWeeklyBestSellingByCategory(Product.Category category, int limit) {
+        java.time.LocalDateTime startDate = java.time.LocalDateTime.now().minusDays(7);
+        List<Product> products = new java.util.ArrayList<>(productRepository.findWeeklyTopSellingProductsByCategory(
+                category, startDate, org.springframework.data.domain.PageRequest.of(0, limit)
+        ));
+        if (products.size() < limit) {
+            List<Product> available = getProductsByCategory(category);
+            for (Product p : available) {
+                if (products.size() >= limit) break;
+                if (!products.contains(p)) products.add(p);
+            }
+        }
+        return products;
+    }
+
+    public java.util.Map<String, List<Product>> getWeeklyBestSellingByCategoryMap(int limit) {
+        java.util.Map<String, List<Product>> map = new java.util.LinkedHashMap<>();
+        map.put("Fresh Vegetables", getWeeklyBestSellingByCategory(Product.Category.VEGETABLES, limit));
+        map.put("Fruits", getWeeklyBestSellingByCategory(Product.Category.FRUITS, limit));
+        map.put("Dairy & Eggs", getWeeklyBestSellingByCategory(Product.Category.DAIRY, limit));
+        map.put("Bakery", getWeeklyBestSellingByCategory(Product.Category.BAKERY, limit));
+        map.put("Meat & Fish", getWeeklyBestSellingByCategory(Product.Category.MEAT, limit));
+        map.put("Beverages", getWeeklyBestSellingByCategory(Product.Category.BEVERAGES, limit));
+        return map;
+    }
+
     public Product getProductById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));

@@ -18,8 +18,20 @@ public class InventoryController {
 
     @GetMapping("/alerts")
     public String viewAlerts(Model model) {
+        java.util.List<com.lankafreshmart.lanka_fresh_mart.model.Product> allProducts = productService.getAllProducts();
+        java.util.List<com.lankafreshmart.lanka_fresh_mart.model.Product> lowStockProducts = allProducts.stream()
+                .filter(p -> p.getQuantityOnHand() <= p.getReorderLevel())
+                .collect(java.util.stream.Collectors.toList());
+        
+        long outOfStockCount = lowStockProducts.stream().filter(p -> p.getQuantityOnHand() == 0).count();
+        long lowStockCount = lowStockProducts.stream().filter(p -> p.getQuantityOnHand() > 0).count();
+
         model.addAttribute("alerts", inventoryService.getActiveAlerts());
-        model.addAttribute("products", productService.getAllProducts());
+        model.addAttribute("products", allProducts);
+        model.addAttribute("lowStockProducts", lowStockProducts);
+        model.addAttribute("outOfStockCount", outOfStockCount);
+        model.addAttribute("lowStockCount", lowStockCount);
+        
         return "inventory/alerts";
     }
 
@@ -33,6 +45,23 @@ public class InventoryController {
         try {
             inventoryService.resolveAlertAndRestock(alertId, restockAmount);
             redirectAttributes.addFlashAttribute("success", "Product successfully restocked and alert resolved!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        
+        return "redirect:/inventory/alerts";
+    }
+
+    @PostMapping("/quick-restock/{productId}")
+    public String quickRestockProduct(@PathVariable Long productId, @RequestParam int restockAmount, RedirectAttributes redirectAttributes) {
+        if (restockAmount <= 0) {
+            redirectAttributes.addFlashAttribute("error", "Restock amount must be greater than zero.");
+            return "redirect:/inventory/alerts";
+        }
+        
+        try {
+            inventoryService.quickRestock(productId, restockAmount);
+            redirectAttributes.addFlashAttribute("success", "Product successfully restocked!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
