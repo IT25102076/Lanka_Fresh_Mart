@@ -67,7 +67,7 @@
                                             <a th:href="@{/drivers/edit/{id}(id=${driver.id})}" class="btn btn-sm btn-outline-primary" title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <form th:action="@{/drivers/delete/{id}(id=${driver.id})}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to remove this driver?');">
+                                            <form th:action="@{/drivers/delete/{id}(id=${driver.id})}" method="post" class="d-inline" data-confirm="Please confirm the removal of this driver.">
                                                 <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
                                                     <i class="bi bi-trash"></i>
                                                 </button>

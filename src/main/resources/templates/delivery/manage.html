@@ -4,7 +4,7 @@
     <title>Manage Deliveries - Lanka Fresh Mart</title>
 </head>
 <body>
-    <main class="page-content bg-light">
+    <main class="page-content bg-light" data-ajax-forms th:classappend="${success != null or error != null} ? 'no-animations' : ''">
         <div class="container">
             <div class="page-header">
                 <h2><i class="bi bi-truck"></i> Manage Deliveries</h2>
@@ -42,7 +42,7 @@
                                         <!-- Auto-submit driver assignment -->
                                         <form th:action="@{/deliveries/update/{id}(id=${delivery.id})}" method="post" class="lfm-form">
                                             <input type="hidden" name="status" th:value="${delivery.status}">
-                                            <select name="driverId" class="form-select form-select-sm" style="min-width: 130px; border-radius: var(--radius-pill);" onchange="sessionStorage.setItem('manage_delivery_scroll', window.scrollY); this.form.submit()">
+                                            <select name="driverId" class="form-select form-select-sm" style="min-width: 130px; border-radius: var(--radius-pill);" onchange="this.form.requestSubmit()">
                                                 <option value="">Unassigned</option>
                                                 <option th:each="d : ${drivers}" 
                                                         th:value="${d.id}" 
@@ -53,51 +53,53 @@
                                         </form>
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <div class="status-cell"><div class="status-pipeline">
                                             <!-- Preparing -->
                                             <form th:action="@{/deliveries/update/{id}(id=${delivery.id})}" method="post" class="m-0">
                                                 <input type="hidden" name="status" value="PREPARING">
                                                 <input type="hidden" name="driverId" th:value="${delivery.driver?.id}">
-                                                <button type="submit" class="btn p-0 border-0" th:disabled="${delivery.status.name() == 'PREPARING'}">
-                                                    <span class="badge-lfm" 
-                                                          th:classappend="${delivery.status.name() == 'PREPARING' ? 'badge-lfm-warning' : 'border border-secondary border-opacity-25 text-secondary bg-transparent'}">
+                                                <button type="submit" class="btn p-0 border-0 status-step-btn" th:disabled="${delivery.status?.name() == 'PREPARING'}">
+                                                    <span class="badge-lfm status-step step-preparing" 
+                                                          th:classappend="${delivery.status?.name() == 'PREPARING' ? 'is-current' : ''}">
                                                         PREPARING
                                                     </span>
                                                 </button>
                                             </form>
                                             
-                                            <i class="bi bi-chevron-right text-muted opacity-50" style="font-size: 0.6rem;"></i>
+                                            <i class="bi bi-chevron-right status-chevron"></i>
                                             
                                             <!-- Dispatched -->
                                             <form th:action="@{/deliveries/update/{id}(id=${delivery.id})}" method="post" class="m-0">
                                                 <input type="hidden" name="status" value="DISPATCHED">
                                                 <input type="hidden" name="driverId" th:value="${delivery.driver?.id}">
-                                                <button type="submit" class="btn p-0 border-0" 
-                                                        th:disabled="${delivery.status.name() == 'DISPATCHED' or delivery.driver == null}"
+                                                <button type="submit" class="btn p-0 border-0 status-step-btn" 
+                                                        th:classappend="${delivery.driver == null and delivery.status?.name() != 'DISPATCHED' ? 'is-locked' : ''}"
+                                                        th:disabled="${delivery.status?.name() == 'DISPATCHED' or delivery.driver == null}"
                                                         th:title="${delivery.driver == null ? 'Driver required' : ''}">
-                                                    <span class="badge-lfm" 
-                                                          th:classappend="${delivery.status.name() == 'DISPATCHED' ? 'badge-lfm-info shadow-sm' : 'border border-secondary border-opacity-25 text-secondary bg-transparent'}">
+                                                    <span class="badge-lfm status-step step-dispatched" 
+                                                          th:classappend="${delivery.status?.name() == 'DISPATCHED' ? 'is-current' : ''}">
                                                         DISPATCHED
                                                     </span>
                                                 </button>
                                             </form>
 
-                                            <i class="bi bi-chevron-right text-muted opacity-50" style="font-size: 0.6rem;"></i>
+                                            <i class="bi bi-chevron-right status-chevron"></i>
                                             
                                             <!-- Delivered -->
                                             <form th:action="@{/deliveries/update/{id}(id=${delivery.id})}" method="post" class="m-0">
                                                 <input type="hidden" name="status" value="DELIVERED">
                                                 <input type="hidden" name="driverId" th:value="${delivery.driver?.id}">
-                                                <button type="submit" class="btn p-0 border-0" 
-                                                        th:disabled="${delivery.status.name() == 'DELIVERED' or delivery.driver == null}"
+                                                <button type="submit" class="btn p-0 border-0 status-step-btn" 
+                                                        th:classappend="${delivery.driver == null and delivery.status?.name() != 'DELIVERED' ? 'is-locked' : ''}"
+                                                        th:disabled="${delivery.status?.name() == 'DELIVERED' or delivery.driver == null}"
                                                         th:title="${delivery.driver == null ? 'Driver required' : ''}">
-                                                    <span class="badge-lfm" 
-                                                          th:classappend="${delivery.status.name() == 'DELIVERED' ? 'badge-lfm-success shadow-sm' : 'border border-secondary border-opacity-25 text-secondary bg-transparent'}">
+                                                    <span class="badge-lfm status-step step-delivered" 
+                                                          th:classappend="${delivery.status?.name() == 'DELIVERED' ? 'is-current' : ''}">
                                                         DELIVERED
                                                     </span>
                                                 </button>
                                             </form>
-                                        </div>
+                                        </div></div>
                                     </td>
                                 </tr>
                                 <tr th:if="${#lists.isEmpty(deliveries)}">
@@ -116,29 +118,18 @@
             </div>
         </div>
         
+        <!-- Status/driver forms are submitted in place by /js/ajax-forms.js (data-ajax-forms) -->
         <script>
             document.addEventListener("DOMContentLoaded", function() {
-                var scrollpos = sessionStorage.getItem('manage_delivery_scroll');
-                if (scrollpos) {
-                    window.scrollTo(0, scrollpos);
-                    sessionStorage.removeItem('manage_delivery_scroll');
-                }
-            });
-
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', function() {
-                    sessionStorage.setItem('manage_delivery_scroll', window.scrollY);
+                // Fix dropdown z-index overlap in tables
+                document.addEventListener('show.bs.dropdown', function (e) {
+                    var dropdown = e.target.closest('.dropdown');
+                    if (dropdown) dropdown.style.zIndex = '1050';
                 });
-            });
-
-            // Fix dropdown z-index overlap in tables
-            document.addEventListener('show.bs.dropdown', function (e) {
-                var dropdown = e.target.closest('.dropdown');
-                if (dropdown) dropdown.style.zIndex = '1050';
-            });
-            document.addEventListener('hide.bs.dropdown', function (e) {
-                var dropdown = e.target.closest('.dropdown');
-                if (dropdown) dropdown.style.zIndex = '';
+                document.addEventListener('hide.bs.dropdown', function (e) {
+                    var dropdown = e.target.closest('.dropdown');
+                    if (dropdown) dropdown.style.zIndex = '';
+                });
             });
         </script>
     </main>
