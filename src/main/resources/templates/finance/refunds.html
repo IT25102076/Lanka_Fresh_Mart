@@ -4,7 +4,7 @@
     <title>Process Refunds - Lanka Fresh Mart</title>
 </head>
 <body>
-    <main class="page-content bg-light">
+    <main class="page-content bg-light" data-ajax-forms th:classappend="${success != null or error != null} ? 'no-animations' : ''">
         <div class="container">
             <div class="page-header">
                 <h2><i class="bi bi-cash-stack"></i> Process Refunds</h2>
@@ -17,7 +17,7 @@
             <div class="card-lfm">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span class="fw-bold">Cancelled Orders Pending Refund</span>
-                    <span class="badge-lfm badge-lfm-warning"><span th:text="${#lists.size(refunds)}">0</span> Pending</span>
+                    <span class="badge-lfm badge-lfm-warning"><span th:text="${refunds.?[status != null and status.name() == 'PENDING'].size()}">0</span> Pending</span>
                 </div>
                 
                 <div class="card-body p-0">
@@ -47,9 +47,11 @@
                                     </td>
                                     <td class="text-center">
                                         <!-- Simulate refund process -->
-                                        <form th:action="@{/finance/refunds/process/{id}(id=${refund.id})}" method="post" onsubmit="return confirm('Confirm manual refund processed via payment gateway?');">
-                                            <button type="submit" class="btn-lfm-primary btn-lfm-sm" th:disabled="${refund.status?.name() == 'COMPLETED'}">
-                                                <i class="bi bi-check2-circle me-1"></i> <span th:text="${refund.status?.name() == 'COMPLETED' ? 'Refunded' : 'Mark Refunded'}"></span>
+                                        <form th:action="@{/finance/refunds/process/{id}(id=${refund.id})}" method="post" data-confirm="Please confirm that you wish to process this manual refund via the payment gateway.">
+                                            <button type="submit" class="btn-lfm-primary btn-lfm-sm" style="width: 150px; display: inline-flex; align-items: center; justify-content: center;"
+                                                    th:classappend="${refund.status?.name() == 'COMPLETED' ? 'refund-done' : ''}"
+                                                    th:disabled="${refund.status?.name() == 'COMPLETED'}">
+                                                <i class="bi me-1" th:classappend="${refund.status?.name() == 'COMPLETED' ? 'bi-check-circle-fill' : 'bi-check2-circle'}"></i> <span th:text="${refund.status?.name() == 'COMPLETED' ? 'Refunded' : 'Mark Refunded'}"></span>
                                             </button>
                                         </form>
                                     </td>
