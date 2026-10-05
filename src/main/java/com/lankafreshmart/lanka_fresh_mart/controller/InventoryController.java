@@ -31,7 +31,7 @@ public class InventoryController {
         model.addAttribute("lowStockProducts", lowStockProducts);
         model.addAttribute("outOfStockCount", outOfStockCount);
         model.addAttribute("lowStockCount", lowStockCount);
-        
+        model.addAttribute("resolvedAlerts", inventoryService.getResolvedAlerts());
         return "inventory/alerts";
     }
 
@@ -80,13 +80,24 @@ public class InventoryController {
         return "redirect:/inventory/alerts";
     }
 
-    @PostMapping("/alerts/dismiss/{alertId}")
-    public String dismissAlert(@PathVariable Long alertId, RedirectAttributes redirectAttributes) {
+    @PostMapping("/alerts/resolve/{alertId}")
+    public String resolveAlert(@PathVariable Long alertId, RedirectAttributes redirectAttributes) {
         try {
-            inventoryService.dismissAlert(alertId);
-            redirectAttributes.addFlashAttribute("success", "Alert successfully dismissed and deleted from the database.");
+            inventoryService.resolveAlert(alertId);
+            redirectAttributes.addFlashAttribute("success", "Alert marked as resolved.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Failed to dismiss alert: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to resolve alert: " + e.getMessage());
+        }
+        return "redirect:/inventory/alerts";
+    }
+
+    @PostMapping("/alerts/delete/{alertId}")
+    public String deleteAlert(@PathVariable Long alertId, RedirectAttributes redirectAttributes) {
+        try {
+            inventoryService.deleteAlert(alertId);
+            redirectAttributes.addFlashAttribute("success", "Alert permanently deleted.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to delete alert: " + e.getMessage());
         }
         return "redirect:/inventory/alerts";
     }

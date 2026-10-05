@@ -83,8 +83,21 @@ public class InventoryService {
         alertRepository.save(alert);
     }
 
+    public List<InventoryAlert> getResolvedAlerts() {
+        return alertRepository.findByIsResolvedTrueOrderByResolvedAtDesc();
+    }
+
     @Transactional
-    public void dismissAlert(Long alertId) {
+    public void resolveAlert(Long alertId) {
+        InventoryAlert alert = alertRepository.findById(alertId)
+                .orElseThrow(() -> new RuntimeException("Alert not found"));
+        alert.setResolved(true);
+        alert.setResolvedAt(LocalDateTime.now());
+        alertRepository.save(alert);
+    }
+
+    @Transactional
+    public void deleteAlert(Long alertId) {
         InventoryAlert alert = alertRepository.findById(alertId)
                 .orElseThrow(() -> new RuntimeException("Alert not found"));
         alertRepository.delete(alert);

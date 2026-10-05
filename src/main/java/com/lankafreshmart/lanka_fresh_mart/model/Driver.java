@@ -30,7 +30,7 @@ public class Driver {
     private DriverStatus status = DriverStatus.AVAILABLE;
 
     public enum DriverStatus {
-        AVAILABLE, ON_DELIVERY, OFF_DUTY
+        AVAILABLE, UNAVAILABLE
     }
 
     @Builder.Default

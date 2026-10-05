@@ -118,15 +118,16 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(Long id) {
-        try {
-            productRepository.deleteById(id);
-            productRepository.flush(); // Force the delete to catch constraints
-        } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            // Product is used in orders, soft delete instead
-            Product existingProduct = getProductById(id);
-            existingProduct.setAvailability(Product.Availability.UNAVAILABLE);
-            productRepository.save(existingProduct);
-        }
+        Product existingProduct = getProductById(id);
+        existingProduct.setAvailability(Product.Availability.UNAVAILABLE);
+        productRepository.save(existingProduct);
+    }
+
+    @Transactional
+    public void restoreProduct(Long id) {
+        Product existingProduct = getProductById(id);
+        existingProduct.setAvailability(Product.Availability.AVAILABLE);
+        productRepository.save(existingProduct);
     }
 
     @Transactional
@@ -137,10 +138,7 @@ public class ProductService {
             productRepository.deleteById(id);
             productRepository.flush(); // Force immediate execution to catch foreign key constraints
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            // Fallback to soft delete if it's already used in Orders
-            product.setAvailability(Product.Availability.UNAVAILABLE);
-            productRepository.save(product);
-            throw new RuntimeException("Product is linked to existing data (like Orders or Carts). It has been safely Discontinued instead of permanently deleted.");
+            throw new RuntimeException("Product is linked to existing data (like Orders or Carts). Please use the 'Discontinue' button instead.");
         }
     }
 }

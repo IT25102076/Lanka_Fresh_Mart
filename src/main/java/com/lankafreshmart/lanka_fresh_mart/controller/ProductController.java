@@ -110,6 +110,17 @@ public class ProductController {
         return "redirect:/products/manage";
     }
 
+    @PostMapping("/manage/restore/{id}")
+    public String restoreProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            productService.restoreProduct(id);
+            redirectAttributes.addFlashAttribute("success", "Product restored successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error restoring product: " + e.getMessage());
+        }
+        return "redirect:/products/manage";
+    }
+
     @PostMapping("/manage/hard-delete/{id}")
     public String hardDeleteProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {

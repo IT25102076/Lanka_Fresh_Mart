@@ -88,8 +88,8 @@ public class OrderService {
     @Transactional
     public void hardDeleteOrder(Long orderId) {
         Order order = getOrderById(orderId);
-        if (order.getStatus() != Order.Status.CANCELLED) {
-            throw new RuntimeException("Only cancelled orders can be permanently deleted.");
+        if (order.getStatus() != Order.Status.CANCELLED && order.getStatus() != Order.Status.REFUNDED) {
+            throw new RuntimeException("Only cancelled or refunded orders can be permanently deleted.");
         }
         
         // Remove associated delivery if exists to prevent foreign key errors

@@ -4,7 +4,7 @@
     <title th:text="${driver.id != null ? 'Edit Driver' : 'Add Driver'} + ' - Lanka Fresh Mart'"></title>
 </head>
 <body>
-    <main class="page-content bg-light">
+    <main class="page-content bg-light" data-ajax-forms th:classappend="${success != null or error != null} ? 'no-animations' : ''">
         <div class="container">
             <div class="mb-4">
                 <a th:href="@{/drivers}" class="btn-lfm-outline btn-lfm-sm"><i class="bi bi-arrow-left"></i> Back to Drivers</a>
@@ -36,11 +36,24 @@
                             </div>
                         </div>
                         
-                        <div class="mb-4">
-                            <label for="vehicleNumber" class="form-label">Vehicle Registration Number *</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="bi bi-truck"></i></span>
-                                <input type="text" class="form-control border-start-0 text-uppercase" id="vehicleNumber" th:field="*{vehicleNumber}" placeholder="e.g. WP CAA-1234" required>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="vehicleType" class="form-label">Vehicle Type *</label>
+                                <select class="form-select" id="vehicleType" th:field="*{vehicleType}" required>
+                                    <option value="" disabled selected>Select Type</option>
+                                    <option value="Bike">Bike</option>
+                                    <option value="Three-Wheeler">Three-Wheeler</option>
+                                    <option value="Mini-Truck">Mini-Truck</option>
+                                    <option value="Van">Van</option>
+                                    <option value="Lorry">Lorry</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="vehicleNumber" class="form-label">Registration Number *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="bi bi-truck"></i></span>
+                                    <input type="text" class="form-control border-start-0 text-uppercase" id="vehicleNumber" th:field="*{vehicleNumber}" placeholder="e.g. WP CAA-1234" required>
+                                </div>
                             </div>
                         </div>
                         

@@ -59,6 +59,10 @@ public class FinanceController {
         }
         model.addAttribute("recentOrders", recentOrders);
         
+        model.addAttribute("totalExpenses", financeService.getTotalExpenses());
+        model.addAttribute("netProfit", financeService.getNetProfit());
+        model.addAttribute("expenses", financeService.getAllExpenses());
+        
         return "finance/dashboard";
     }
 

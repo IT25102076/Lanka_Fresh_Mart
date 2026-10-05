@@ -4,7 +4,7 @@
     <title>Manage Drivers - Lanka Fresh Mart</title>
 </head>
 <body>
-    <main class="page-content bg-light">
+    <main class="page-content bg-light" data-ajax-forms th:classappend="${success != null or error != null} ? 'no-animations' : ''">
         <div class="container">
             <div class="page-header">
                 <h2><i class="bi bi-people"></i> Manage Delivery Drivers</h2>

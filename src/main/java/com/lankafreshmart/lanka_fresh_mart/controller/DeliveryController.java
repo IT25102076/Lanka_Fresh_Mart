@@ -93,8 +93,9 @@ public class DeliveryController {
             if (delivery != null) {
                 model.addAttribute("delivery", delivery);
                 
-                // For cancelled orders, look up refund status from the refunds table
-                if (delivery.getOrder().getStatus() == com.lankafreshmart.lanka_fresh_mart.model.Order.Status.CANCELLED) {
+                // For cancelled or refunded orders, look up refund status from the refunds table
+                if (delivery.getOrder().getStatus() == com.lankafreshmart.lanka_fresh_mart.model.Order.Status.CANCELLED ||
+                    delivery.getOrder().getStatus() == com.lankafreshmart.lanka_fresh_mart.model.Order.Status.REFUNDED) {
                     Refund refund = refundRepository.findByOrderId(orderId).orElse(null);
                     model.addAttribute("refund", refund);
                 }
