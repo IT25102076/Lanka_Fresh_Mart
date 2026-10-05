@@ -25,12 +25,12 @@ public class DataSeeder implements CommandLineRunner {
             
             String password = passwordEncoder.encode("Password123");
 
-            createUserIfNotFound("Test", "Customer", "customer@test.com", password, User.Role.CUSTOMER);
-            createUserIfNotFound("Test", "Supervisor", "supervisor@test.com", password, User.Role.STORE_SUPERVISOR);
-            createUserIfNotFound("Test", "Delivery", "delivery@test.com", password, User.Role.DELIVERY_COORDINATOR);
-            createUserIfNotFound("Test", "Finance", "finance@test.com", password, User.Role.FINANCE_EXECUTIVE);
-            createUserIfNotFound("Test", "Support", "support@test.com", password, User.Role.CUSTOMER_RELATIONS_OFFICER);
-            createUserIfNotFound("Test", "Operations", "operations@test.com", password, User.Role.OPERATIONS_MANAGER);
+            createUserIfNotFound("Customer", "User", "customer@test.com", password, User.Role.CUSTOMER);
+            createUserIfNotFound("Supervisor", "User", "supervisor@test.com", password, User.Role.STORE_SUPERVISOR);
+            createUserIfNotFound("Delivery", "User", "delivery@test.com", password, User.Role.DELIVERY_COORDINATOR);
+            createUserIfNotFound("Finance", "User", "finance@test.com", password, User.Role.FINANCE_EXECUTIVE);
+            createUserIfNotFound("Support", "User", "support@test.com", password, User.Role.CUSTOMER_RELATIONS_OFFICER);
+            createUserIfNotFound("Operations", "User", "operations@test.com", password, User.Role.OPERATIONS_MANAGER);
             
             System.out.println("All test accounts created successfully!");
             System.out.println("Password for all accounts is: Password123");
