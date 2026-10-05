@@ -27,25 +27,7 @@ public class AuthController {
         return "auth/login";
     }
 
-    @PostMapping("/fast-switch")
-    public String fastSwitch(@org.springframework.web.bind.annotation.RequestParam String email, 
-                             @org.springframework.web.bind.annotation.RequestParam(required = false, defaultValue = "/home") String redirectUrl,
-                             jakarta.servlet.http.HttpServletRequest request) {
-        try {
-            org.springframework.security.core.userdetails.UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-            org.springframework.security.authentication.UsernamePasswordAuthenticationToken auth = 
-                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            
-            org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
-            
-            jakarta.servlet.http.HttpSession session = request.getSession(true);
-            session.setAttribute(org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, 
-                org.springframework.security.core.context.SecurityContextHolder.getContext());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "redirect:" + redirectUrl;
-    }
+
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {

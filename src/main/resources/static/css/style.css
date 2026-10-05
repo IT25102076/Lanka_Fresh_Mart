@@ -1,9 +1,9 @@
 /* =============================================
    Lanka Fresh Mart — Dribbble Redesign
-   Fonts: DM Serif Display & Inter
+   Fonts: Plus Jakarta Sans & Inter
    ============================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 :root {
     /* Colors */
@@ -19,7 +19,7 @@
     --clr-border: #E9ECEF;
 
     /* Typography */
-    --font-heading: 'DM Serif Display', serif;
+    --font-heading: 'Plus Jakarta Sans', sans-serif;
     --font-body: 'Inter', sans-serif;
 
     /* Shadows & Radii */
@@ -1436,6 +1436,148 @@ h6,
     color: #d97706;
 }
 
+/* ── Status Pipeline Steps (solid current state) ── */
+.btn.status-step-btn,
+.btn.status-step-btn:disabled {
+    opacity: 1;
+}
+
+.btn.status-step-btn.is-locked:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: auto;
+}
+
+.status-step {
+    display: inline-block;
+    width: var(--status-step-w, 112px);
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+    border: 1px solid rgba(108, 117, 125, 0.3);
+    color: #6c757d;
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+/* Fixed-width layout so every row lines up */
+.status-cell {
+    --status-step-w: 112px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.status-pipeline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    width: calc(3 * var(--status-step-w, 112px) + 2 * 14px + 4 * 0.25rem);
+}
+
+.status-chevron {
+    width: 14px;
+    text-align: center;
+    font-size: 0.6rem;
+    color: #adb5bd;
+}
+
+.status-action-slot {
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: calc(100% + 0.5rem);
+}
+
+.status-step-btn:not(:disabled):hover .status-step {
+    border-color: var(--clr-primary);
+    color: var(--clr-primary);
+    transform: translateY(-1px);
+}
+
+.status-step.is-current {
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.status-step.is-current.step-preparing {
+    background-color: #f59e0b;
+}
+
+.status-step.is-current.step-dispatched {
+    background-color: #0ea5e9;
+}
+
+.status-step.is-current.step-delivered {
+    background-color: var(--clr-primary);
+}
+
+.status-step.is-current.step-pending {
+    background-color: #f59e0b;
+}
+
+.status-step.is-current.step-confirmed {
+    background-color: #0ea5e9;
+}
+
+.status-step.is-current.step-cancelled {
+    background-color: #dc3545;
+}
+
+.status-step.is-current.step-refunded {
+    background-color: #8b5cf6;
+}
+
+/* Closed orders (Cancelled / Refunded): one bar spanning the whole pipeline */
+.status-step.status-step-full {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.08em;
+}
+
+.status-cancel-btn {
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid rgba(220, 53, 69, 0.35);
+    background: transparent;
+    color: #dc3545;
+    font-size: 0.7rem;
+    padding: 0;
+    transition: all 0.2s ease;
+}
+
+.status-cancel-btn:hover {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+/* Completed refund: outlined, non-interactive */
+.btn-lfm-primary.refund-done,
+.btn-lfm-primary.refund-done:disabled,
+.btn-lfm-primary.refund-done:hover {
+    background: transparent !important;
+    color: var(--clr-primary) !important;
+    border: none !important;
+    box-shadow: inset 0 0 0 1.5px var(--clr-primary) !important;
+    transform: none !important;
+    opacity: 1 !important;
+    cursor: default;
+}
+
 .alert-lfm {
     padding: 1rem 1.25rem;
     border-radius: var(--radius-md);
@@ -2123,6 +2265,116 @@ h6,
     animation: slideUp 0.4s ease-out both;
 }
 
+/* — Utility to disable animations on post-redirect — */
+.no-animations * {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* — In-place (AJAX) form submit in progress — */
+main.ajax-busy { cursor: progress; }
+main.ajax-busy form button,
+main.ajax-busy form select { pointer-events: none; }
+
+/* — Floating toast notifications (replace inline banners on AJAX pages) — */
+main[data-ajax-forms] .alert-lfm-success,
+main[data-ajax-forms] .alert-lfm-danger { display: none; }
+
+.lfm-toast-stack {
+    position: fixed;
+    top: 96px;
+    right: 24px;
+    z-index: 1090;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.lfm-toast {
+    --toast-clr: var(--clr-primary);
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 360px;
+    max-width: calc(100vw - 48px);
+    padding: 14px 14px 16px 16px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--clr-border);
+    border-left: 4px solid var(--toast-clr);
+    border-radius: var(--radius-md);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--clr-text);
+    overflow: hidden;
+    pointer-events: auto;
+    animation: toastIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.lfm-toast-danger { --toast-clr: #DC3545; }
+
+.lfm-toast-icon {
+    font-size: 1.25rem;
+    color: var(--toast-clr);
+    flex-shrink: 0;
+}
+
+.lfm-toast-text {
+    flex: 1;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.lfm-toast-close {
+    border: 0;
+    background: transparent;
+    color: var(--clr-text-muted);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+.lfm-toast-close:hover { background: var(--clr-bg); color: var(--clr-text); }
+
+.lfm-toast-bar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 100%;
+    background: var(--toast-clr);
+    opacity: 0.35;
+    transform-origin: left;
+    animation: toastBar 3.5s linear forwards;
+}
+
+.lfm-toast-danger .lfm-toast-bar { animation-duration: 6s; }
+.lfm-toast:hover .lfm-toast-bar { animation-play-state: paused; }
+
+.lfm-toast.is-leaving { animation: toastOut 0.25s ease-in forwards; }
+
+@keyframes toastIn {
+    from { opacity: 0; transform: translateX(24px) scale(0.98); }
+    to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toastOut {
+    to { opacity: 0; transform: translateX(24px); }
+}
+
+@keyframes toastBar {
+    from { transform: scaleX(1); }
+    to   { transform: scaleX(0); }
+}
+
 /* — Empty state entrance — */
 .empty-state {
     animation: scaleIn 0.5s ease-out both;
@@ -2210,4 +2462,323 @@ h6,
 .req-icon {
     font-size: 0.7rem;
     transition: all 0.2s;
+}
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE LAYER — TABLET & MOBILE
+   Every rule below is wrapped in a max-width media
+   query, so desktop / laptop (≥ 992px) is untouched.
+   ══════════════════════════════════════════════ */
+
+/* ---------- Tablet & below (< 992px) ---------- */
+@media (max-width: 991.98px) {
+
+    /* Navbar: search drops to its own full-width row */
+    .lfm-header {
+        margin: 0.75rem;
+        padding: 0.85rem 1.25rem 0;
+        border-radius: var(--radius-lg);
+    }
+
+    .nav-top-row {
+        flex-wrap: wrap;
+        row-gap: 0.85rem;
+    }
+
+    .nav-search-center {
+        position: relative;
+        left: auto;
+        transform: none;
+        order: 3;
+        flex: 0 0 100%;
+        max-width: none;
+    }
+
+    /* Tables scroll sideways instead of overflowing the page */
+    .table-responsive {
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-lfm {
+        min-width: 680px;
+    }
+
+    .table-lfm th {
+        white-space: nowrap;
+    }
+
+    /* Empty tables: keep the "nothing here" message fully visible */
+    .table-lfm:has(.empty-state) {
+        min-width: 0;
+    }
+
+    .table-lfm:has(.empty-state) thead {
+        display: none;
+    }
+
+    /* Login / register: let the page grow instead of clipping */
+    .login-page {
+        height: auto;
+        min-height: calc(100vh - 140px);
+        overflow: visible;
+        padding: 1rem 0 2rem;
+    }
+
+    .login-hero-form {
+        max-height: none;
+        overflow: visible;
+        justify-content: center;
+        padding: 0 1rem;
+    }
+
+    .login-card-floating,
+    .login-hero-layout.is-register-mode .login-card-floating {
+        max-width: 560px;
+    }
+
+    /* Cart summary should not stick on stacked layout */
+    .col-lg-4 > .sticky-top {
+        position: static;
+    }
+}
+
+/* ---------- Mobile landscape & below (< 768px) ---------- */
+@media (max-width: 767.98px) {
+
+    /* Hero island: switch from absolute collage to stacked flow */
+    .hero-island {
+        flex-direction: column;
+        align-items: stretch;
+        min-height: 0;
+        margin: 0 0.75rem;
+        padding: 2.25rem 1.25rem 2.5rem;
+        border-radius: 28px;
+    }
+
+    .hero-giant-text {
+        position: relative;
+        top: 0;
+        font-size: 16vw;
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-island > .container-fluid {
+        position: relative !important;
+        height: auto !important;
+    }
+
+    .hero-content-left {
+        position: relative;
+        bottom: auto;
+        left: auto;
+        max-width: 100%;
+        padding: 0 0.25rem;
+    }
+
+    .hero-content-left p {
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-sparkle {
+        display: none;
+    }
+
+    /* Section headings */
+    .section-title {
+        font-size: 1.45rem !important;
+        letter-spacing: -0.5px !important;
+    }
+
+    .section-head {
+        gap: 0.75rem;
+    }
+
+    .btn-dark-pill {
+        padding: 0.35rem 0.35rem 0.35rem 1rem;
+        font-size: 0.8rem;
+        gap: 0.6rem;
+        flex-shrink: 0;
+    }
+
+    .btn-dark-pill .arrow-circle {
+        width: 26px;
+        height: 26px;
+    }
+
+    /* Category tab pills scroll horizontally */
+    #bestSellingTabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 0.25rem;
+        scrollbar-width: none;
+    }
+
+    #bestSellingTabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    #bestSellingTabs .nav-link {
+        white-space: nowrap;
+    }
+
+    .category-pill {
+        padding: 0.45rem 1rem;
+        font-size: 0.82rem;
+    }
+
+    /* Dashboard / data pages */
+    .page-content {
+        padding: 1.5rem 0;
+    }
+
+    .page-header {
+        flex-wrap: wrap;
+        gap: 0.85rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.4rem;
+    }
+
+    .card-lfm .card-header {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        padding: 1rem 1.1rem;
+    }
+
+    .stat-card {
+        padding: 1.15rem;
+    }
+
+    .stat-card h2 {
+        font-size: 1.75rem;
+    }
+
+    /* Track order stepper fits narrow screens */
+    .track-stepper-line {
+        left: calc(35px + 18px);
+        right: calc(35px + 18px);
+    }
+
+    /* Cart page */
+    .cart-head {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .cart-head h2 {
+        font-size: 1.5rem !important;
+    }
+
+    .cart-item-row {
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 1.1rem !important;
+    }
+
+    .cart-item-actions {
+        width: 100%;
+        justify-content: space-between;
+        gap: 0.75rem !important;
+    }
+
+    .cart-item-price {
+        min-width: 0 !important;
+        font-size: 1rem !important;
+    }
+
+    /* Footer bottom bar spacing when stacked */
+    .footer .border-top {
+        gap: 0.6rem;
+        text-align: center;
+    }
+
+    /* Floating UI */
+    .scroll-top-btn {
+        bottom: 1rem;
+        right: 1rem;
+        width: 42px;
+        height: 42px;
+    }
+
+    .lfm-toast-stack {
+        top: 80px;
+        left: 12px;
+        right: 12px;
+    }
+
+    .lfm-toast {
+        width: auto;
+        max-width: 100%;
+    }
+}
+
+/* ---------- Small phones (< 576px) ---------- */
+@media (max-width: 575.98px) {
+
+    .lfm-header {
+        margin: 0.5rem;
+        padding: 0.75rem 0.9rem 0;
+    }
+
+    .brand-text {
+        font-size: 1.4rem;
+    }
+
+    .nav-actions {
+        gap: 0.5rem;
+    }
+
+    .nav-pill {
+        padding: 0.45rem 0.75rem;
+        font-size: 0.8rem;
+        gap: 0.35rem;
+    }
+
+    /* Icon-only Cart / Staff Portal pills on tiny screens */
+    .nav-pill-label {
+        display: none;
+    }
+
+    .hero-island {
+        margin: 0 0.5rem;
+        border-radius: 24px;
+    }
+
+    .hero-content-left p {
+        font-size: 0.9rem;
+    }
+
+    .product-card .img-wrapper {
+        padding: 1rem;
+    }
+
+    .login-card-floating,
+    .login-hero-layout.is-register-mode .login-card-floating {
+        padding: 1.5rem 1.25rem;
+        border-radius: 20px;
+    }
+
+    .login-card-floating h3 {
+        font-size: 1.45rem;
+    }
+
+    .page-header .btn-lfm-primary {
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+
+    .btn-lfm-primary,
+    .btn-lfm-outline,
+    .btn-lfm-danger {
+        padding: 0.65rem 1.2rem;
+    }
+
+    .empty-state {
+        padding: 2.5rem 1rem;
+    }
 }
