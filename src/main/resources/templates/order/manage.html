@@ -4,7 +4,7 @@
     <title>Manage Orders - Lanka Fresh Mart</title>
 </head>
 <body>
-    <main class="page-content bg-light">
+    <main class="page-content bg-light" data-ajax-forms th:classappend="${success != null or error != null} ? 'no-animations' : ''">
         <div class="container">
             <div class="page-header">
                 <h2><i class="bi bi-list-check"></i> Manage Orders</h2>
@@ -39,38 +39,61 @@
                                     </td>
                                     <td th:text="${#temporals.format(order.createdAt, 'dd MMM yyyy, HH:mm')}"></td>
                                     <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(order.totalAmount, 1, 2)}"></td>
-                                    <td class="text-center">
-                                        <div class="dropdown">
-                                            <button class="btn border-0 dropdown-toggle badge-lfm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.5rem 1rem;"
-                                                    th:classappend="${order.status?.name() == 'PENDING' ? 'badge-lfm-warning' : (order.status?.name() == 'CONFIRMED' ? 'badge-lfm-info' : (order.status?.name() == 'DELIVERED' ? 'badge-lfm-success' : (order.status?.name() == 'REFUNDED' ? 'badge-lfm-purple' : 'badge-lfm-danger')))}">
-                                                <span th:text="${order.status != null ? order.status : 'PENDING'}"></span>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="border-radius: var(--radius-md);">
-                                                <li>
-                                                    <form th:action="@{/orders/manage/update/{id}(id=${order.id})}" method="post">
-                                                        <input type="hidden" name="status" value="CONFIRMED">
-                                                        <button type="submit" class="dropdown-item text-success" th:disabled="${order.status?.name() != 'PENDING'}">
-                                                            <i class="bi bi-check-circle me-2"></i> Confirm Order
-                                                        </button>
-                                                    </form>
-                                                </li>
-                                                <li>
-                                                    <form th:action="@{/orders/manage/update/{id}(id=${order.id})}" method="post">
-                                                        <input type="hidden" name="status" value="DELIVERED">
-                                                        <button type="submit" class="dropdown-item text-primary" th:disabled="${order.status?.name() == 'CANCELLED' or order.status?.name() == 'REFUNDED' or order.status?.name() == 'DELIVERED'}">
-                                                            <i class="bi bi-house-check me-2"></i> Mark Delivered
-                                                        </button>
-                                                    </form>
-                                                </li>
-                                                <li><hr class="dropdown-divider"></li>
-                                                <li>
-                                                    <form th:action="@{/orders/manage/cancel/{id}(id=${order.id})}" method="post" onsubmit="return confirm('Are you sure you want to cancel this order?');">
-                                                        <button type="submit" class="dropdown-item text-danger" th:disabled="${order.status?.name() == 'CANCELLED' or order.status?.name() == 'REFUNDED' or order.status?.name() == 'DELIVERED'}">
-                                                            <i class="bi bi-x-circle me-2"></i> Cancel Order
-                                                        </button>
-                                                    </form>
-                                                </li>
-                                            </ul>
+                                    <td class="text-center" th:with="st=${order.status != null ? order.status.name() : 'PENDING'}">
+                                        <div class="status-cell">
+                                            <!-- Closed orders (off the main path): one bar spanning the whole pipeline -->
+                                            <div th:if="${st == 'CANCELLED' or st == 'REFUNDED'}" class="status-pipeline">
+                                                <span class="badge-lfm status-step status-step-full is-current"
+                                                      th:classappend="${st == 'CANCELLED' ? 'step-cancelled' : 'step-refunded'}">
+                                                    <i class="bi me-1" th:classappend="${st == 'CANCELLED' ? 'bi-x-circle-fill' : 'bi-arrow-counterclockwise'}"></i>
+                                                    <span th:text="${st}"></span>
+                                                </span>
+                                            </div>
+
+                                            <!-- Active pipeline -->
+                                            <div th:unless="${st == 'CANCELLED' or st == 'REFUNDED'}" class="status-pipeline">
+                                                <!-- Pending -->
+                                                <button type="button" class="btn p-0 border-0 status-step-btn" disabled>
+                                                    <span class="badge-lfm status-step step-pending"
+                                                          th:classappend="${st == 'PENDING' ? 'is-current' : ''}">PENDING</span>
+                                                </button>
+
+                                                <i class="bi bi-chevron-right status-chevron"></i>
+
+                                                <!-- Confirmed -->
+                                                <form th:action="@{/orders/manage/update/{id}(id=${order.id})}" method="post" class="m-0">
+                                                    <input type="hidden" name="status" value="CONFIRMED">
+                                                    <button type="submit" class="btn p-0 border-0 status-step-btn"
+                                                            th:disabled="${st != 'PENDING'}"
+                                                            th:title="${st == 'PENDING' ? 'Confirm order' : ''}">
+                                                        <span class="badge-lfm status-step step-confirmed"
+                                                              th:classappend="${st == 'CONFIRMED' ? 'is-current' : ''}">CONFIRMED</span>
+                                                    </button>
+                                                </form>
+
+                                                <i class="bi bi-chevron-right status-chevron"></i>
+
+                                                <!-- Delivered -->
+                                                <form th:action="@{/orders/manage/update/{id}(id=${order.id})}" method="post" class="m-0">
+                                                    <input type="hidden" name="status" value="DELIVERED">
+                                                    <button type="submit" class="btn p-0 border-0 status-step-btn"
+                                                            th:disabled="${st == 'DELIVERED'}"
+                                                            th:title="${st != 'DELIVERED' ? 'Mark delivered' : ''}">
+                                                        <span class="badge-lfm status-step step-delivered"
+                                                              th:classappend="${st == 'DELIVERED' ? 'is-current' : ''}">DELIVERED</span>
+                                                    </button>
+                                                </form>
+                                            </div>
+
+                                            <!-- Action slot (always reserved so columns line up) -->
+                                            <div class="status-action-slot">
+                                                <form th:if="${st == 'PENDING' or st == 'CONFIRMED'}" th:action="@{/orders/manage/cancel/{id}(id=${order.id})}" method="post" class="m-0"
+                                                      data-confirm="Please confirm order cancellation.">
+                                                    <button type="submit" class="status-cancel-btn" title="Cancel order">
+                                                        <i class="bi bi-x-lg"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -90,29 +113,18 @@
             </div>
         </div>
         
+        <!-- Status/cancel forms are submitted in place by /js/ajax-forms.js (data-ajax-forms) -->
         <script>
             document.addEventListener("DOMContentLoaded", function() {
-                var scrollpos = sessionStorage.getItem('manage_order_scroll');
-                if (scrollpos) {
-                    window.scrollTo(0, scrollpos);
-                    sessionStorage.removeItem('manage_order_scroll');
-                }
-            });
-
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', function() {
-                    sessionStorage.setItem('manage_order_scroll', window.scrollY);
+                // Fix dropdown z-index overlap in tables
+                document.addEventListener('show.bs.dropdown', function (e) {
+                    var dropdown = e.target.closest('.dropdown');
+                    if (dropdown) dropdown.style.zIndex = '1050';
                 });
-            });
-
-            // Fix dropdown z-index overlap in tables
-            document.addEventListener('show.bs.dropdown', function (e) {
-                var dropdown = e.target.closest('.dropdown');
-                if (dropdown) dropdown.style.zIndex = '1050';
-            });
-            document.addEventListener('hide.bs.dropdown', function (e) {
-                var dropdown = e.target.closest('.dropdown');
-                if (dropdown) dropdown.style.zIndex = '';
+                document.addEventListener('hide.bs.dropdown', function (e) {
+                    var dropdown = e.target.closest('.dropdown');
+                    if (dropdown) dropdown.style.zIndex = '';
+                });
             });
         </script>
     </main>

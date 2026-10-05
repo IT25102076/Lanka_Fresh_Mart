@@ -40,13 +40,20 @@ public class CartService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        if (product.getAvailability() == Product.Availability.UNAVAILABLE || product.getQuantityOnHand() < quantity) {
-            throw new RuntimeException("Insufficient stock. Only " + product.getQuantityOnHand() + " " + product.getUnit() + " available");
-        }
-
         Optional<CartItem> existingItem = cart.getItems().stream()
                 .filter(item -> item.getProduct().getId().equals(productId))
                 .findFirst();
+
+        int totalRequested = quantity;
+        if (existingItem.isPresent()) {
+            totalRequested += existingItem.get().getQuantity();
+        }
+
+        if (product.getAvailability() == Product.Availability.UNAVAILABLE || product.getQuantityOnHand() < totalRequested) {
+            throw new RuntimeException("Insufficient stock. Only " + product.getQuantityOnHand() + " " + product.getUnit() + " available");
+        }
+
+
 
         if (existingItem.isPresent()) {
             CartItem item = existingItem.get();

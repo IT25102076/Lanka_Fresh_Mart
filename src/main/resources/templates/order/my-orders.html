@@ -138,7 +138,7 @@
                             <div>
                                 <form th:if="${order.status?.name() == 'PENDING'}" 
                                       th:action="@{/orders/my-orders/cancel/{id}(id=${order.id})}" method="post" 
-                                      onsubmit="return confirm('Are you sure you want to cancel this order? This cannot be undone.');" class="m-0">
+                                      data-confirm="Please confirm order cancellation. This action cannot be undone." class="m-0">
                                     <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3" style="font-weight: 600; font-size: 0.82rem;">
                                         <i class="bi bi-x-circle me-1"></i> Cancel
                                     </button>
