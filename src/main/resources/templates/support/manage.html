@@ -4,7 +4,7 @@
     <title>Manage Support - Lanka Fresh Mart</title>
 </head>
 <body>
-    <main class="page-content bg-light">
+    <main class="page-content bg-light" data-ajax-forms th:classappend="${success != null or error != null} ? 'no-animations' : ''">
         <div class="container">
             <div class="page-header">
                 <h2><i class="bi bi-kanban"></i> Manage Support Tickets</h2>
@@ -60,7 +60,7 @@
                                             <div class="text-success fw-bold small">
                                                 <i class="bi bi-check-circle-fill me-1"></i> Resolved
                                             </div>
-                                            <form th:action="@{/support/manage/delete/{id}(id=${ticket.id})}" method="post" onsubmit="return confirm('Delete this resolved ticket?');" class="mb-0">
+                                            <form th:action="@{/support/manage/delete/{id}(id=${ticket.id})}" method="post" data-confirm="Are you sure you wish to delete this resolved support ticket?" class="mb-0">
                                                 <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Ticket"><i class="bi bi-trash"></i></button>
                                             </form>
                                         </div>
